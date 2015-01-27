@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="splash.png">
 <meta name="format-detection" content="telephone=no">
 <script src = "http://code.jquery.com/jquery.min.js"></script>
 <script>
@@ -381,9 +382,14 @@ html, body {
 	width: 100%;
 }
 
+#splash {
+	display: none;
+}
+
 </style>
 </head>
 <body>
+<div id="splash"><img src="splash.png"/></div>
 <div id="header">
 	<a href="http://about.me/stephenhouser" id="about" type="button";">About</a>
 	<div id="score">0</div>
