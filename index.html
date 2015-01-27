@@ -1,19 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/ -->
 <html>
 <head>
 <title>Maine Campus Crush</title>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
-
 <script src = "http://code.jquery.com/jquery.min.js"></script>
 <script>
+
 $(document).ready(function(){
 	// iPhone 5s
-	var cols = 5;
-	var rows = 5;
+	var cols = 8;
+	var rows = 8;
+	var gemSize = 60;
+	var gemInnerSize = 50;
+	var topMargin = 10;
+	var leftMargin = 10;
 
   	$("#marker").css({
   		"width":"52px",
@@ -35,21 +40,21 @@ $(document).ready(function(){
 
   	for(i=0; i<rows; i++){
      	jewels[i] = new Array();
-     	for(j=0; j<8; j++){
+     	for(j=0; j<cols; j++){
           	jewels[i][j]=-1;
      	}
   	}
 
 	for(i=0; i<rows; i++){
-		for(j=0; j<8; j++){
+		for(j=0; j<cols; j++){
 			do{
 				jewels[i][j] = Math.floor(Math.random()*8);
 			} while(isStreak(i,j));
 
 			$("#gamefield").append('<div class = "gem" id = "gem_'+i+'_'+j+'"></div>');
 			$("#gem_"+i+"_"+j).css({
-				"top":(i*60)+10+"px",
-				"left":(j*60)+10+"px",
+				"top":(i*gemSize)+topMargin+"px",
+				"left":(j*gemSize)+leftMargin+"px",
 				"width":"50px",
 				"height":"50px",
 				"position":"absolute",
@@ -126,7 +131,7 @@ $(document).ready(function(){
 
 	function placeNewGems(){
 		var gemsPlaced = 0;
-		for(i=0;i<8;i++){
+		for(i=0;i<cols;i++){
 			if(jewels[0][i]==-1){
 				jewels[0][i]=Math.floor(Math.random()*8);
           		$("#gamefield").append('<div class = "gem" id = "gem_0_'+i+'"></div>');
@@ -153,8 +158,8 @@ $(document).ready(function(){
 		else{
 			var combo=0
 			for(i=0;i<rows;i++){
-      			for(j=0;j<8;j++){
-      				if(j<=5 && jewels[i][j]==jewels[i][j+1] && jewels[i][j]==jewels[i][j+2]){
+      			for(j=0;j<cols;j++){
+      				if(j<=(cols-3) && jewels[i][j]==jewels[i][j+1] && jewels[i][j]==jewels[i][j+2]){
 						combo++;
 						removeGems(i,j);
 					}
@@ -177,7 +182,7 @@ $(document).ready(function(){
 
 	function checkFalling(){
 		var fellDown=0;
-		for(j=0;j<8;j++){
+		for(j=0;j<cols;j++){
 			for(i=(rows-1);i>0;i--){
 				if(jewels[i][j]==-1 && jewels[i-1][j]>=0){
 					$("#gem_"+(i-1)+"_"+j).addClass("fall").attr("id","gem_"+i+"_"+j);
@@ -275,7 +280,7 @@ $(document).ready(function(){
 				tmp--;
 			}
 			tmp=col;
-			while(tmp<7 && jewels[row][tmp+1]==gemValue){
+			while(tmp<(cols-1) && jewels[row][tmp+1]==gemValue){
 				$("#gem_"+row+"_"+(tmp+1)).addClass("remove");
 				jewels[row][tmp+1]=-1;
 				tmp++;
@@ -309,7 +314,7 @@ $(document).ready(function(){
 			tmp--;
 		}
 		tmp=col;
-		while(tmp<7 && jewels[row][tmp+1]==gemValue){
+		while(tmp<(cols-1) && jewels[row][tmp+1]==gemValue){
 			streak++;
 			tmp++;
 		}
