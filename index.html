@@ -16,9 +16,15 @@ $(document).ready(function(){
 	var cols = 8;
 	var rows = 8;
 
+	var cellSize = 39;			// 60
+	var gemSize = 33;			// 50
+	var markerSize = gemSize+2;	// 52
+	var topOffset = 10;			// 10
+	var leftOffset = 10;		// 10
+
   	$("#marker").css({
-  		"width":"52px",
-  		"height":"52px",
+  		"width":markerSize+"px",
+  		"height":markerSize+"px",
   		"border-radius":"5px",
   		"border":"5px solid white",
   		"position":"absolute"
@@ -49,14 +55,15 @@ $(document).ready(function(){
 
 			$("#gamefield").append('<div class = "gem" id = "gem_'+i+'_'+j+'"></div>');
 			$("#gem_"+i+"_"+j).css({
-				"top":(i*60)+10+"px",
-				"left":(j*60)+10+"px",
-				"width":"50px",
-				"height":"50px",
+				"top":(i*cellSize)+10+"px",
+				"left":(j*cellSize)+10+"px",
+				"width":gemSize+"px",
+				"height":gemSize+"px",
 				"position":"absolute",
 				"border":"2px solid white",
 				"border-radius": "5px",
 				"cursor":"pointer",
+				"background-size":gemSize+"px",
 				"background-image":bgImages[jewels[i][j]],
 				"background-color":bgColors[jewels[i][j]]
 			});
@@ -69,12 +76,12 @@ $(document).ready(function(){
 			$("#marker").show();
 			$("#marker").css("top",posY-5).css("left",posX-5);
 			if(selectedRow==-1){
-				selectedRow=(posY-10)/60;
-				selectedCol=(posX-10)/60;
+				selectedRow=(posY-10)/cellSize;
+				selectedCol=(posX-10)/cellSize;
 			}
 			else{
-				posY=(posY-10)/60;
-				posX=(posX-10)/60;
+				posY=(posY-10)/cellSize;
+				posX=(posX-10)/cellSize;
 				if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
 					$("#marker").hide();
 					gameState="switch";
@@ -133,13 +140,14 @@ $(document).ready(function(){
           		$("#gamefield").append('<div class = "gem" id = "gem_0_'+i+'"></div>');
           		$("#gem_0_"+i).css({
           			"top":"10px",
-          			"left":(i*60)+10+"px",
-          			"width":"50px",
-          			"height":"50px",
+          			"left":(i*cellSize)+10+"px",
+          			"width":gemSize+"px",
+          			"height":gemSize+"px",
           			"position":"absolute",
 					"border":"2px solid white",
 					"border-radius": "5px",
           			"cursor":"pointer",
+					"background-size":gemSize+"px",
           			"background-image":bgImages[jewels[0][i]],
           			"background-color":bgColors[jewels[0][i]]
           		});
@@ -191,7 +199,7 @@ $(document).ready(function(){
 		$.each($(".fall"),function(){
 			movingItems++;
 			$(this).animate({
-				top: "+=60"
+				top: "+=" + cellSize
 				},{
 				duration: 150,
 				complete: function(){
@@ -234,8 +242,8 @@ $(document).ready(function(){
 		$.each($(".switch"),function(){
 			movingItems++;
 			$(this).animate({
-				left: "+="+xOffset*60*$(this).attr("dir"),
-				top: "+="+yOffset*60*$(this).attr("dir")
+				left: "+="+xOffset*cellSize*$(this).attr("dir"),
+				top: "+="+yOffset*cellSize*$(this).attr("dir")
 				},{
 				duration: 150,
 				complete: function(){
