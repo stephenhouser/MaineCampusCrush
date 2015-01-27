@@ -15,10 +15,6 @@ $(document).ready(function(){
 	// iPhone 5s
 	var cols = 8;
 	var rows = 8;
-	var gemSize = 60;
-	var gemInnerSize = 50;
-	var topMargin = 10;
-	var leftMargin = 10;
 
   	$("#marker").css({
   		"width":"52px",
@@ -53,8 +49,8 @@ $(document).ready(function(){
 
 			$("#gamefield").append('<div class = "gem" id = "gem_'+i+'_'+j+'"></div>');
 			$("#gem_"+i+"_"+j).css({
-				"top":(i*gemSize)+topMargin+"px",
-				"left":(j*gemSize)+leftMargin+"px",
+				"top":(i*60)+10+"px",
+				"left":(j*60)+10+"px",
 				"width":"50px",
 				"height":"50px",
 				"position":"absolute",
