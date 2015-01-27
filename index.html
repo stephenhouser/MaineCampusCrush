@@ -5,18 +5,38 @@
 <title>Maine Campus Crush</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="splash.png">
-<link rel="image_src" href="splash.png" />
-<meta name="format-detection" content="telephone=no">
-<script src = "http://code.jquery.com/jquery.min.js"></script>
-<script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
+<link rel="apple-touch-icon" href="splash.png">
+<link rel="apple-touch-startup-image" href="/startup-image.png">
+<link rel="image_src" href="splash.png" />
+
+<meta name="format-detection" content="telephone=no">
+<script type="application/x-javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
+
+<script>
 $(document).ready(function(){
+	var clearSound = new Howl({urls: ['clear.wav']});
+	var dropSound = new Howl({urls: ['drop.wav']});
+	var selectSound = new Howl({urls: ['select.wav']});
+	var errorSound = new Howl({urls: ['error.wav']});
+	var backgroundSound = new Howl({
+		urls: ['background.mp3'],
+		autoplay: true,
+		loop: true,
+		volume: 0.25
+	}).play();
+
 	// iPhone 5s
 	var cols = 6;
 	var rows = 8;
+
+	if (window.navigator.standalone) {
+		rows = 9;
+	}
 
 	var gamePos = $('#gamefield').position();
 	var topOffset = gamePos.top;		// 10
@@ -79,6 +99,7 @@ $(document).ready(function(){
 			});
 		}
 	}
+
 	$(document).on("click",".gem", function(){
 		if(gameState=="pick"){
 			posY=$(this).position().top;
@@ -86,6 +107,7 @@ $(document).ready(function(){
 			$("#marker").show();
 			$("#marker").css("top",posY-5).css("left",posX-5);
 			if(selectedRow==-1){
+				selectSound.play();
 				selectedRow=(posY-topOffset)/cellSize;
 				selectedCol=(posX-leftOffset)/cellSize;
 			}
@@ -112,14 +134,15 @@ $(document).ready(function(){
     				case "revert":
     				case "switch":
                   		if(!isStreak(selectedRow,selectedCol) && !isStreak(posY,posX)){
-               			if(gameState!="revert"){
-							gameState="revert";
-               				gemSwitch();
-               			}
-               			else{
-							gameState="pick";
-							selectedRow=-1;
-						}
+							if(gameState!="revert"){
+								errorSound.play();
+								gameState="revert";
+								gemSwitch();
+							}
+							else{
+								gameState="pick";
+								selectedRow=-1;
+							}
                     	}
 					else{
 						gameState="remove";
@@ -163,8 +186,10 @@ $(document).ready(function(){
           		});
 
           		gemsPlaced++;
+				dropSound.play();
 			}
 		}
+
 		if(gemsPlaced){
 			gameState="remove";
 			checkFalling();
@@ -206,6 +231,7 @@ $(document).ready(function(){
 				}
 			}
 		}
+
 		$.each($(".fall"),function(){
 			movingItems++;
 			$(this).animate({
@@ -218,6 +244,7 @@ $(document).ready(function(){
 				}
 			});
 		});
+
 		if(fellDown==0){
 			gameState="refill";
 			movingItems=1;
@@ -227,6 +254,8 @@ $(document).ready(function(){
 
 	function gemFade(){
 		$.each($(".remove"),function(){
+			clearSound.play();
+
 			movingItems++;
 			$(this).animate({
 				opacity:0
@@ -273,12 +302,14 @@ $(document).ready(function(){
 		var gemValue = jewels[row][col];
 		var tmp = row;
 		$("#gem_"+row+"_"+col).addClass("remove");
+
 		if(isVerticalStreak(row,col)){
 			while(tmp>0 && jewels[tmp-1][col]==gemValue){
 				$("#gem_"+(tmp-1)+"_"+col).addClass("remove");
 				jewels[tmp-1][col]=-1;
 				tmp--;
 			}
+
 			tmp=row;
 			while(tmp<(rows-1) && jewels[tmp+1][col]==gemValue){
 				$("#gem_"+(tmp+1)+"_"+col).addClass("remove");
@@ -286,6 +317,7 @@ $(document).ready(function(){
 				tmp++;
 			}
 		}
+
 		if(isHorizontalStreak(row,col)){
 			tmp = col;
 			while(tmp>0 && jewels[row][tmp-1]==gemValue){
@@ -293,6 +325,7 @@ $(document).ready(function(){
 				jewels[row][tmp-1]=-1;
 				tmp--;
 			}
+
 			tmp=col;
 			while(tmp<(cols-1) && jewels[row][tmp+1]==gemValue){
 				$("#gem_"+row+"_"+(tmp+1)).addClass("remove");
@@ -300,6 +333,7 @@ $(document).ready(function(){
 				tmp++;
 			}
 		}
+
 		jewels[row][col]=-1;
 	}
 
@@ -410,45 +444,49 @@ a {
 </style>
 </head>
 <body>
-<div id="about">
-	<h2>Maine Campus Crush</h2>
-	<p>Score points by swapping two adjacent campus mascots to make chains
-	of three or more of the same campus mascot. Swap mascots by
-	clicking or tapping on them.</p>
-	<br/>
-	<p>The campuses and mascots of the University of Maine System:
-	<ul>
-		<li>UMaine - Black Bears</li>
-		<li>USM - Huskies</li>
-		<li>UMA - Moose</li>
-		<li>UMF - Beavers</li>
-		<li>UMM - Clippers</li>
-		<li>UMFK - Bengals</li>
-		<li>UMPI - Owls</li>
-		<li>UMS - "Blue Ball"</li>
-	</ul>
-	</p>
-	<br/>
-	<p>The base code was adapted from
-	<a href="http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/">Emanuele Feronato</a>'s
-	blog article on a JavaScript Bejeweled Game.</a> The mascot images were used from each
-	campuses website -- taking the one that best matched the style of the game.</p>
+	<div id="about">
+		<h2>Maine Campus Crush</h2>
+		<p>Score points by swapping two adjacent campus mascots to make chains
+		of three or more of the same campus mascot. Swap mascots by
+		clicking or tapping on them.</p>
+		<br/>
+		<p>The campuses and mascots of the University of Maine System:
+		<ul>
+			<li>UMaine - Black Bears</li>
+			<li>USM - Huskies</li>
+			<li>UMA - Moose</li>
+			<li>UMF - Beavers</li>
+			<li>UMM - Clippers</li>
+			<li>UMFK - Bengals</li>
+			<li>UMPI - Owls</li>
+			<li>UMS - "Blue Ball"</li>
+		</ul>
+		</p>
+		<br/>
+		<p>The base code was adapted from
+		<a href="http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/">Emanuele Feronato</a>'s
+		blog article on a JavaScript Bejeweled Game.</a> The mascot images were used from each
+		campuses website -- taking the one that best matched the style of the game.</p>
 
-	<br/>
-	<p>-- <a href="http://about.me/stephenhouser">Stephen Houser</a></p>
+		<br/>
+		<p>-- <a href="http://about.me/stephenhouser">Stephen Houser</a></p>
 
-	<button id="done" type="button" onClick="hideAbout();">Ok</button>
-</div>
+		<button id="done" type="button" onClick="hideAbout();">Ok</button>
+	</div>
 
-<div id="splash"><img src="splash.png"/></div>
-<div id="header">
-	<a href="#" id="about-button" type="button" onClick="showAbout();">About</a>
-	<div id="score">0</div>
-	<a href="#" id="replay-button" type="button" onClick="location.reload();">Replay</a>
-</div>
-<div id="gamefield">
-</div>
-<div id="marker">
-</div>
+	<div id="splash"><img src="splash.png"/>
+	</div>
+
+	<div id="header">
+		<a href="#" id="about-button" type="button" onClick="showAbout();">About</a>
+		<div id="score">0</div>
+		<a href="#" id="replay-button" type="button" onClick="location.reload();">Replay</a>
+	</div>
+
+	<div id="gamefield">
+	</div>
+
+	<div id="marker">
+	</div>
 </body>
 </html>
