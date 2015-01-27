@@ -7,6 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="splash.png">
+<link rel="image_src" href="splash.png" />
 <meta name="format-detection" content="telephone=no">
 <script src = "http://code.jquery.com/jquery.min.js"></script>
 <script>
@@ -337,6 +339,14 @@ $(document).ready(function(){
 		return isVerticalStreak(row,col)||isHorizontalStreak(row,col);
 	}
 });
+
+function hideAbout() {
+	$("#about").hide();
+}
+
+function showAbout() {
+	$("#about").show();
+}
 </script>
 <style>
 * {
@@ -354,18 +364,18 @@ html, body {
 	color: white;
 }
 
-#header a {
+a {
 	color: white;
 }
 
-#about {
+#about-button {
 	position: absolute;
 	top: 5px;
 	left: 10px;
 	font-size: large;
 }
 
-#replay {
+#replay-button {
 	position: absolute;
 	top: 5px;
 	right: 10px;
@@ -381,17 +391,62 @@ html, body {
 	width: 100%;
 }
 
+#splash {
+	display: none;
+}
+
+#about {
+	display: none;
+	position: absolute;
+	background-color: rgba(128, 128, 128, 0.95);
+	color: white;
+	top: 5%;
+	left: 5%;
+	height: 90%;
+	width: 90%;
+	z-index: 10;
+}
+
 </style>
 </head>
 <body>
+<div id="about">
+	<h2>Maine Campus Crush</h2>
+	<p>Score points by swapping two adjacent campus mascots to make chains
+	of three or more of the same campus mascot. Swap mascots by
+	clicking or tapping on them.</p>
+	<br/>
+	<p>The campuses and mascots of the University of Maine System:
+	<ul>
+		<li>UMaine - Black Bears</li>
+		<li>USM - Huskies</li>
+		<li>UMA - Moose</li>
+		<li>UMF - Beavers</li>
+		<li>UMM - Clippers</li>
+		<li>UMFK - Bengals</li>
+		<li>UMPI - Owls</li>
+		<li>UMS - "Blue Ball"</li>
+	</ul>
+	</p>
+	<br/>
+	<p>The base code was adapted from
+	<a href="http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/">Emanuele Feronato</a>'s
+	blog article on a JavaScript Bejeweled Game.</a> The mascot images were used from each
+	campuses website -- taking the one that best matched the style of the game.</p>
+
+	<br/>
+	<p>-- <a href="http://about.me/stephenhouser">Stephen Houser</a></p>
+
+	<button id="done" type="button" onClick="hideAbout();">Ok</button>
+</div>
+
+<div id="splash"><img src="splash.png"/></div>
 <div id="header">
-	<a href="http://about.me/stephenhouser" id="about" type="button";">About</a>
+	<a href="#" id="about-button" type="button" onClick="showAbout();">About</a>
 	<div id="score">0</div>
-	<a href="#" id="replay" type="button" onClick="location.reload();">Replay</a>
+	<a href="#" id="replay-button" type="button" onClick="location.reload();">Replay</a>
 </div>
 <div id="gamefield">
-</div>
-<div id="footer">
 </div>
 <div id="marker">
 </div>
