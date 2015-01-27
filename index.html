@@ -13,14 +13,22 @@
 
 $(document).ready(function(){
 	// iPhone 5s
-	var cols = 8;
+	var cols = 6;
 	var rows = 8;
 
-	var cellSize = 39;			// 60
-	var gemSize = 33;			// 50
-	var markerSize = gemSize+2;	// 52
-	var topOffset = 10;			// 10
-	var leftOffset = 10;		// 10
+	var gamePos = $('#gamefield').position();
+	var topOffset = gamePos.top;		// 10
+	var leftOffset = 5;					// 10
+
+	var gameFieldWidth = cols * cellSize;
+	if ($(window).width() > 360) {
+		leftOffset = ($(window).width() - 360) / 2;
+	}
+
+	var cellSize = Math.floor(Math.min(60, (($(window).width() - (leftOffset * 2)) / cols)));
+	var gemSize = Math.floor(cellSize * 0.8);
+	//var gemSize = cellSize - 8;
+	var markerSize = gemSize + 2;
 
   	$("#marker").css({
   		"width":markerSize+"px",
@@ -55,8 +63,8 @@ $(document).ready(function(){
 
 			$("#gamefield").append('<div class = "gem" id = "gem_'+i+'_'+j+'"></div>');
 			$("#gem_"+i+"_"+j).css({
-				"top":(i*cellSize)+10+"px",
-				"left":(j*cellSize)+10+"px",
+				"top":(i*cellSize)+topOffset+"px",
+				"left":(j*cellSize)+leftOffset+"px",
 				"width":gemSize+"px",
 				"height":gemSize+"px",
 				"position":"absolute",
@@ -76,12 +84,12 @@ $(document).ready(function(){
 			$("#marker").show();
 			$("#marker").css("top",posY-5).css("left",posX-5);
 			if(selectedRow==-1){
-				selectedRow=(posY-10)/cellSize;
-				selectedCol=(posX-10)/cellSize;
+				selectedRow=(posY-topOffset)/cellSize;
+				selectedCol=(posX-leftOffset)/cellSize;
 			}
 			else{
-				posY=(posY-10)/cellSize;
-				posX=(posX-10)/cellSize;
+				posY=(posY-topOffset)/cellSize;
+				posX=(posX-leftOffset)/cellSize;
 				if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
 					$("#marker").hide();
 					gameState="switch";
@@ -139,8 +147,8 @@ $(document).ready(function(){
 				jewels[0][i]=Math.floor(Math.random()*8);
           		$("#gamefield").append('<div class = "gem" id = "gem_0_'+i+'"></div>');
           		$("#gem_0_"+i).css({
-          			"top":"10px",
-          			"left":(i*cellSize)+10+"px",
+          			"top":topOffset+"px",
+          			"left":(i*cellSize)+leftOffset+"px",
           			"width":gemSize+"px",
           			"height":gemSize+"px",
           			"position":"absolute",
@@ -328,27 +336,45 @@ $(document).ready(function(){
 	function isStreak(row,col){
 		return isVerticalStreak(row,col)||isHorizontalStreak(row,col);
 	}
-
 });
 </script>
 <style>
-body {
+* {
+	margin: 0;
+}
+
+html, body {
 	background-color: black;
 }
 #score {
-	background-color: white;
-	position: absolute;
-	bottom: 0;
-	height: 1em;
+	margin-top: 2px;
+	color: white;
+	font-size: x-large;
+	text-align: center;
 	width: 100%;
+	height: 35px;
+}
+
+#gamefield {
+	width: 100%;
+}
+
+div#footer {
+	text-align: center;
+	position: absolute;
+	width: 100%;
+	bottom: 2px;
 }
 </style>
 </head>
 <body>
-<div id="gamefield">
-</div>
 <div id="score">
 	<span>0</span>
+</div>
+<div id="gamefield">
+</div>
+<div id="footer">
+	<button type="button" onClick="location.reload();">Restart</button>
 </div>
 <div id="marker">
 </div>
