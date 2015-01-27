@@ -4,8 +4,6 @@
 <script src = "http://code.jquery.com/jquery.min.js"></script>
 <script>
 $(document).ready(function(){
-	$("body").append('<div id="score"><span>0</span></div>').css({"background-color":"white","margin":"0"});
-	$("body").append('<div id = "gamefield"></div><div id = "marker"></div>').css({"background-color":"black","margin":"0"});
   	$("#marker").css({
   		"width":"52px",
   		"height":"52px",
@@ -180,7 +178,7 @@ $(document).ready(function(){
 			$(this).animate({
 				top: "+=60"
 				},{
-				duration: 250,
+				duration: 150,
 				complete: function(){
 					$(this).removeClass("fall");
 					checkMoving();
@@ -200,7 +198,7 @@ $(document).ready(function(){
 			$(this).animate({
 				opacity:0
 				},{
-				duration: 250,
+				duration: 150,
 				complete: function(){
 					$(this).remove();
 					checkMoving();
@@ -224,7 +222,7 @@ $(document).ready(function(){
 				left: "+="+xOffset*60*$(this).attr("dir"),
 				top: "+="+yOffset*60*$(this).attr("dir")
 				},{
-				duration: 250,
+				duration: 150,
 				complete: function(){
 					checkMoving();
 				}
@@ -310,7 +308,26 @@ $(document).ready(function(){
 
 });
 </script>
+<style>
+body {
+	background-color: black;
+}
+#score {
+	background-color: white;
+	position: absolute;
+	bottom: 0;
+	height: 1em;
+	width: 100%;
+}
+</style>
 </head>
 <body>
+<div id="gamefield">
+</div>
+<div id="score">
+	<span>0</span>
+</div>
+<div id="marker">
+</div>
 </body>
 </html>
