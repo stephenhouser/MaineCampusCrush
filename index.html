@@ -16,9 +16,10 @@
 <meta name="format-detection" content="telephone=no">
 <script type="application/x-javascript" src="http://code.jquery.com/jquery.min.js"></script>
 <script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
+<script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js"></script>
 
 <script>
-/*
+/* Disabled, see below
 var backgroundSound = 0;
 document.addEventListener('visibilitychange', function(){
 		backgroundSound.pause();
@@ -29,54 +30,13 @@ document.addEventListener('visibilitychange', function(){
 */
 
 $(document).ready(function(){
-	var clearSound = new Howl({urls: ['clear.wav']});
-	var dropSound = new Howl({urls: ['drop.wav']});
-	var selectSound = new Howl({urls: ['select.wav']});
-	var errorSound = new Howl({urls: ['error.wav']});
-	/*
-	backgroundSound = new Howl({
-			urls: ['background.mp3'],
-			autoplay: true,
-			loop: true,
-			volume: 0.25
-		}).play();
-	*/
+    // These are the major configuration options
+	var cols = 6;       // Number of columns
+	var rows = 8;       // Number of rows
+  	var jewelTypes = 8; // Number of different types of "jewels"
 
-	var cols = 6;
-	var rows = 8;
-  	var jewelTypes = 8;
-
-	var gamePos = $('#gamefield').position();
-	var topOffset = gamePos.top;		// 10
-	var leftOffset = 7;					// 10
-
-	var preferredCellSize = 60;
-	if ($(window).width() > (preferredCellSize * cols)) {
-		leftOffset = ($(window).width() - (preferredCellSize * cols)) / 2;
-	}
-
-	var cellSize = Math.floor(Math.min(preferredCellSize, (($(window).width() - (leftOffset * 2)) / cols)));
-
-	//rows = Math.floor(($(window).height() - topOffset) / cellSize)
-
-	var gemSize = Math.floor(cellSize * 0.8);
-	var markerSize = gemSize + 2;
-
-  	$("#marker").css({
-  		"width":markerSize+"px",
-  		"height":markerSize+"px",
-  		"border-radius":"5px",
-  		"border":"5px solid white",
-  		"position":"absolute"
-  	}).hide();
-	var selectedRow=-1
-  	var selectedCol=-1
-  	var posX;
-  	var posY;
-  	var jewels=new Array();
-  	var movingItems=0;
-  	var gameState="pick";
-
+    // The background colors. 
+    // There MUST be jewelTypes of them.
   	var bgColors=new Array(
   		"rgba(0,56,147,0.6)",
   		"#75B2DD",
@@ -86,7 +46,9 @@ $(document).ready(function(){
   		"gold",
   		"green",
   		"white");
-  	var bgImages=new Array(
+    // The "jewel" images to use. 
+    // There MUST be jewelTypes of them.
+    var bgImages=new Array(
   		"url(usm.png)",
   		"url(umaine.png)",
   		"url(uma.png)",
@@ -96,6 +58,72 @@ $(document).ready(function(){
   		"url(umm.png)",
   		"url(ums.png)"
   	);
+
+    // Sounds, using howler.js (howlerjs.com)
+	var clearSound = new Howl({urls: ['clear.wav']});
+	var dropSound = new Howl({urls: ['drop.wav']});
+	var selectSound = new Howl({urls: ['select.wav']});
+	var errorSound = new Howl({urls: ['error.wav']});
+	
+	// Background sound.
+	// Background sound is disabled because it is not working correctly.
+	// Code above is designed to pause sound when the page is
+	// not being displayed. It works, but only after switching away and
+	// back to the page. That is, it does not pause the background sound
+	// the first time you switch away, only the second, third, etc...
+	/*
+	backgroundSound = new Howl({
+			urls: ['background.mp3'],
+			autoplay: true,
+			loop: true,
+			volume: 0.25
+		}).play();
+	*/
+
+    // Get the game field somewhat where we want it.
+	var gamePos = $('#gamefield').position();
+	var topOffset = gamePos.top;		// 10
+	var leftOffset = 7;					// 10
+
+	var preferredCellSize = 60; // This is my preferred size for the jewels
+	if ($(window).width() > (preferredCellSize * cols)) {
+		leftOffset = ($(window).width() - (preferredCellSize * cols)) / 2;
+	}
+
+    // Compute what we will actually use for the cell size
+	var cellSize = Math.floor(Math.min(preferredCellSize, (($(window).width() - (leftOffset * 2)) / cols)));
+
+    // Use this if you want to auto-calculate the number 
+    // of rows that will fit on the screen rather than having it fixed (above)
+	//rows = Math.floor(($(window).height() - topOffset) / cellSize)
+
+    // Now figure out the size inside the cell -- where the jewel goes
+	var gemSize = Math.floor(cellSize * 0.8);
+	// And the size of the highlighted marker
+	var markerSize = gemSize + 2;
+
+  	$("#marker").css({
+  		"width":markerSize+"px",
+  		"height":markerSize+"px",
+  		"border-radius":"5px",
+  		"border":"5px solid white",
+  		"position":"absolute"
+  	}).hide();
+    // Swipe handler			
+    $("#marker").swipe({
+        swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+            handleSwipe(event, direction);
+        }
+    });
+
+  	
+	var selectedRow=-1
+  	var selectedCol=-1
+  	var posX;
+  	var posY;
+  	var jewels=new Array(); // all the jewels
+  	var movingItems=0;
+  	var gameState="pick";   // initial game state is picking a cell
 
   	for(i=0; i<rows; i++){
      	jewels[i] = new Array();
@@ -124,8 +152,86 @@ $(document).ready(function(){
 				"background-image":bgImages[jewels[i][j]],
 				"background-color":bgColors[jewels[i][j]]
 			});
+
+            // Swipe handler			
+			$("#gem_"+i+"_"+j).swipe({
+			    swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+			        handleSwipe(event, direction);
+                }
+			});
 		}
 	}
+
+    function getPosition(element) {
+        var xPosition = 0;
+        var yPosition = 0;
+  
+        while(element) {
+            xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+            element = element.offsetParent;
+        }
+        return { x: xPosition, y: yPosition };
+    }
+    
+    function handleSwipe(event, direction) {
+		if(gameState=="pick"){
+		    var pos = getPosition(event.changedTouches[0].target);
+			posY= pos.y;
+			posX= pos.x;
+			$("#marker").show();
+			$("#marker").css("top",posY-5).css("left",posX-5);
+
+			selectSound.play();
+			posY = selectedRow = Math.floor((posY-topOffset)/cellSize);
+			posX = selectedCol = Math.floor((posX-leftOffset)/cellSize);
+
+            var trySwitch = false;
+            switch (direction) {
+                case "up":
+                    if (selectedRow > 0) {
+                        posY = selectedRow - 1;
+                        trySwitch = true;
+                    }
+                    break;
+                case "down":
+                    if (selectedRow < rows - 1 ) {
+                        posY = selectedRow + 1;
+                        trySwitch = true;
+                    }
+                    break;
+                case "left":
+                    if (selectedCol > 0) {
+                        posX = selectedCol - 1;
+                        trySwitch = true;
+                    }
+                    break;
+                case "right":
+                    if (selectedCol < cols - 1) {
+                        posX = selectedCol + 1;
+                        trySwitch = true;
+                    }
+                    break;
+            }
+
+            if (trySwitch) {
+                if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
+                    $("#marker").hide();
+                    gameState="switch";
+                    gemSwitch();
+                } else {
+                    selectedRow=posY;
+                    selectedCol=posX;
+                }
+            } else {
+                // swiped out of bounds...
+                errorSound.play();
+                $("#marker").hide();
+                posY = selectedRow = -1;
+                posX = selectedCol = -1;
+            }
+		}    
+    }
 
 	$(document).on("click",".gem", function(){
 		if(gameState=="pick"){
@@ -211,6 +317,13 @@ $(document).ready(function(){
           			"background-image":bgImages[jewels[0][i]],
           			"background-color":bgColors[jewels[0][i]]
           		});
+          		
+                // Swipe handler			
+                $("#gem_0_"+i).swipe({
+                    swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+    			        handleSwipe(event, direction);
+                    }
+                });
 
           		gemsPlaced++;
 				dropSound.play();
@@ -450,6 +563,7 @@ a {
 
 #gamefield {
 	width: 100%;
+	-webkit-user-select: none;
 }
 
 #splash {
