@@ -205,20 +205,20 @@ $(document).ready(function() {
 		cellRow = Math.floor((position.y - topOffset) / cellSize);
 		cellColumn = Math.floor((position.x - leftOffset) / cellSize);
 
-		console.log('position(' + position.x + ', ' + position.y + ') --> ' +
-		            'cell(' + cellColumn + ', ' + cellRow + ')')
+		//console.log('position(' + position.x + ', ' + position.y + ') --> ' +
+		//            'cell(' + cellColumn + ', ' + cellRow + ')')
 
         return { col: cellColumn, row: cellRow };
     }
 
     function handleTap(event, target) {
-        console.log('handleTap(' + event + ', ' + target + ')');
+        //console.log('handleTap(' + event + ', ' + target + ')');
 
  		if (gameState == "pick") {
  		    var position = getPosition(target);
 			var selectedCell = getCellIndex(position);
 
-            console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
+            //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
 
 			$("#marker").show();
 			$("#marker").css("top", position.y - markerBorderSize).css("left", position.x - markerBorderSize);
@@ -246,7 +246,7 @@ $(document).ready(function() {
     }
 
     function handleSwipe(event, target, direction) {
-        console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
+        //console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
 
 		if (gameState == "pick") {
 		    var pos = getPosition(target);
