@@ -119,10 +119,14 @@ $(document).ready(function(){
   	
 	var selectedRow=-1
   	var selectedCol=-1
+  	
   	var posX;
   	var posY;
+  	
   	var jewels=new Array(); // all the jewels
+  	
   	var movingItems=0;
+  	
   	var gameState="pick";   // initial game state is picking a cell
 
   	for(i=0; i<rows; i++){
@@ -138,7 +142,8 @@ $(document).ready(function(){
 				jewels[i][j] = Math.floor(Math.random()*jewelTypes);
 			} while(isStreak(i,j));
 
-			$("#gamefield").append('<div class = "gem" id = "gem_'+i+'_'+j+'"></div>');
+			$("#gamefield").append('<div class="gem" id="gem_'+i+'_'+j+'"></div>');
+			
 			$("#gem_"+i+"_"+j).css({
 				"top":(i*cellSize)+topOffset+"px",
 				"left":(j*cellSize)+leftOffset+"px",
@@ -156,11 +161,44 @@ $(document).ready(function(){
             // Swipe handler			
 			$("#gem_"+i+"_"+j).swipe({
 			    swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-			        handleSwipe(event, direction);
+			        handleSwipe(event, event.changedTouches[0].target, direction);
+			    },    
+			    tap:function(event, target) {
+			        handleTap(event, target);
                 }
 			});
 		}
 	}
+
+/*
+	$(document).on("click",".gem", function(){
+	    alert('CLICK');
+		if(gameState=="pick"){
+			posY=$(this).position().top;
+			posX=$(this).position().left;
+			$("#marker").show();
+			$("#marker").css("top",posY-5).css("left",posX-5);
+			if(selectedRow==-1){
+				selectSound.play();
+				selectedRow=(posY-topOffset)/cellSize;
+				selectedCol=(posX-leftOffset)/cellSize;
+			}
+			else{
+				posY=(posY-topOffset)/cellSize;
+				posX=(posX-leftOffset)/cellSize;
+				if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
+					$("#marker").hide();
+					gameState="switch";
+					gemSwitch();
+				}
+				else{
+					selectedRow=posY;
+					selectedCol=posX;
+				}
+			}
+		}
+	});
+	*/
 
     function getPosition(element) {
         var xPosition = 0;
@@ -174,9 +212,51 @@ $(document).ready(function(){
         return { x: xPosition, y: yPosition };
     }
     
-    function handleSwipe(event, direction) {
+    function getCellIndex(position) {
+		cellRow = Math.floor((position.y - topOffset) / cellSize);
+		cellColumn = Math.floor((position.x - leftOffset) / cellSize);
+		
+        return { col: cellColumn, row: cellRow };
+    }
+    
+    function handleTap(event, target) {
+        console.log('handleTap(' + event + ', ' + target + ')');
+
+ 		if(gameState=="pick"){
+ 		    var position = getPosition(target);
+			var selectedCell = getCellIndex(position);
+
+            console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
+			
+			$("#marker").show();
+			$("#marker").css("top",position.y-6).css("left",position.x-6);
+
+			if(selectedRow == -1){			    // First cell selection
+				selectSound.play();
+				
+				selectedRow = selectedCell.row;
+				selectedCol = selectedCell.col;
+			} else {			                // Second cell selection
+			    posY = selectedCell.row;
+			    posX = selectedCell.col;
+			    
+				if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
+				   (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
+					$("#marker").hide();
+					gameState="switch";
+					gemSwitch();
+				} else {
+					selectedRow = posY;
+					selectedCol = posX;
+				}
+			}
+		}
+   }
+    
+    function handleSwipe(event, target, direction) {
+        console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
 		if(gameState=="pick"){
-		    var pos = getPosition(event.changedTouches[0].target);
+		    var pos = getPosition(target);
 			posY= pos.y;
 			posX= pos.x;
 			$("#marker").show();
@@ -232,34 +312,7 @@ $(document).ready(function(){
             }
 		}    
     }
-
-	$(document).on("click",".gem", function(){
-		if(gameState=="pick"){
-			posY=$(this).position().top;
-			posX=$(this).position().left;
-			$("#marker").show();
-			$("#marker").css("top",posY-5).css("left",posX-5);
-			if(selectedRow==-1){
-				selectSound.play();
-				selectedRow=(posY-topOffset)/cellSize;
-				selectedCol=(posX-leftOffset)/cellSize;
-			}
-			else{
-				posY=(posY-topOffset)/cellSize;
-				posX=(posX-leftOffset)/cellSize;
-				if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
-					$("#marker").hide();
-					gameState="switch";
-					gemSwitch();
-				}
-				else{
-					selectedRow=posY;
-					selectedCol=posX;
-				}
-			}
-		}
-	});
-
+    
 	function checkMoving(){
 		movingItems--;
     		if(movingItems==0){
@@ -321,7 +374,10 @@ $(document).ready(function(){
                 // Swipe handler			
                 $("#gem_0_"+i).swipe({
                     swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-    			        handleSwipe(event, direction);
+    			        handleSwipe(event, event.changedTouches[0].target, direction);
+                    },    
+                    tap:function(event, target) {
+                        handleTap(event, target);
                     }
                 });
 
