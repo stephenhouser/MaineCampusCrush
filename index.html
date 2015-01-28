@@ -102,15 +102,8 @@ $(document).ready(function(){
 	// And the size of the highlighted marker
 	var markerSize = gemSize + 2;
 
-  	$("#marker").css({
-  		"width"         : markerSize + "px",
-  		"height"        : markerSize + "px",
-  		"border-radius" : "5px",
-  		"border"        : "5px solid white",
-  		"position"      : "absolute"
-  	}).hide();
-
-    var interactionHandlers = {
+    // Swipe and tap handler callbacks for interaction
+    var swipeHandlers = {
         swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 	        handleSwipe(event, event.changedTouches[0].target, direction);
         },
@@ -119,16 +112,17 @@ $(document).ready(function(){
         }
     }
 
-    // Swipe and Tap handlers
-    $("#marker").swipe({
-        swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-	        handleSwipe(event, event.changedTouches[0].target, direction);
-        },
-        tap:function(event, target) {
-            handleTap(event, target);
-        }
-    });
+  	$("#marker").css({
+  		"width"         : markerSize + "px",
+  		"height"        : markerSize + "px",
+  		"border-radius" : "5px",
+  		"border"        : "5px solid white",
+  		"position"      : "absolute"
+  	}).hide();
 
+    // Attach swipe and tap handlers to marker
+    $("#marker").swipe(swipeHandlers);
+    
 	var selectedRow=-1
   	var selectedCol=-1
   	
@@ -155,9 +149,9 @@ $(document).ready(function(){
 			} while(isStreak(i,j));
 
             var gemId = "gem_" + i +"_" + j;
-			$("#gamefield").append('<div class="gem" id="' + gemID + '"></div>');
+			$("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
 			
-			$('#' + gemID).css({
+			$('#' + gemId).css({
 				"top"               : (i * cellSize) + topOffset + "px",
 				"left"              : (j * cellSize) + leftOffset + "px",
 				"width"             : gemSize + "px",
@@ -171,47 +165,10 @@ $(document).ready(function(){
 				"background-color"  : bgColors[jewels[i][j]]
 			});
 
-            // Swipe handler			
-			$('#' + gemID).swipe({
-			    swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-			        handleSwipe(event, event.changedTouches[0].target, direction);
-			    },    
-			    tap:function(event, target) {
-			        handleTap(event, target);
-                }
-			});
+            // Attach swipe and tap handlers
+			$('#' + gemId).swipe(swipeHandlers);
 		}
 	}
-
-/*
-	$(document).on("click",".gem", function(){
-	    alert('CLICK');
-		if(gameState=="pick"){
-			posY=$(this).position().top;
-			posX=$(this).position().left;
-			$("#marker").show();
-			$("#marker").css("top",posY-5).css("left",posX-5);
-			if(selectedRow==-1){
-				selectSound.play();
-				selectedRow=(posY-topOffset)/cellSize;
-				selectedCol=(posX-leftOffset)/cellSize;
-			}
-			else{
-				posY=(posY-topOffset)/cellSize;
-				posX=(posX-leftOffset)/cellSize;
-				if((Math.abs(selectedRow-posY)==1 && selectedCol==posX)||(Math.abs(selectedCol-posX)==1 && selectedRow==posY)){
-					$("#marker").hide();
-					gameState="switch";
-					gemSwitch();
-				}
-				else{
-					selectedRow=posY;
-					selectedCol=posX;
-				}
-			}
-		}
-	});
-	*/
 
     function getPosition(element) {
         var xPosition = 0;
@@ -384,15 +341,8 @@ $(document).ready(function(){
           			"background-color"  : bgColors[jewels[0][i]]
           		});
           		
-                // Swipe handler			
-                $("#gem_0_"+i).swipe({
-                    swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-    			        handleSwipe(event, event.changedTouches[0].target, direction);
-                    },    
-                    tap:function(event, target) {
-                        handleTap(event, target);
-                    }
-                });
+                // Attache swipe and tap handlers			
+                $("#gem_0_"+i).swipe(swipeHandlers);
 
           		gemsPlaced++;
 				dropSound.play();
