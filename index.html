@@ -18,17 +18,29 @@
 <script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
 
 <script>
+/*
+var backgroundSound = 0;
+document.addEventListener('visibilitychange', function(){
+		backgroundSound.pause();
+		if (!document.hidden) {
+			backgroundSound.play();
+		}
+	},false);
+*/
+
 $(document).ready(function(){
 	var clearSound = new Howl({urls: ['clear.wav']});
 	var dropSound = new Howl({urls: ['drop.wav']});
 	var selectSound = new Howl({urls: ['select.wav']});
 	var errorSound = new Howl({urls: ['error.wav']});
-	var backgroundSound = new Howl({
-		urls: ['background.mp3'],
-		autoplay: true,
-		loop: true,
-		volume: 0.25
-	}).play();
+	/*
+	backgroundSound = new Howl({
+			urls: ['background.mp3'],
+			autoplay: true,
+			loop: true,
+			volume: 0.25
+		}).play();
+	*/
 
 	// iPhone 5s
 	var cols = 6;
