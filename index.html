@@ -19,6 +19,9 @@
 <script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js"></script>
 
 <script>
+
+// FIXME: repeated clicks on the same cell moves the marker -2 or so each time.
+
 /* Disabled, see below
 var backgroundSound = 0;
 document.addEventListener('visibilitychange', function(){
@@ -85,9 +88,14 @@ $(document).ready(function() {
     var empty = -1;
 
     // Get the game field somewhat where we want it.
-	var gamePos = $('#gamefield').position();
-	var topOffset = gamePos.top;		// 10
-	var leftOffset = 7;					// 10
+    var gamePos = $('#gamefield').position();
+	var topOffset = gamePos.top;
+	var leftOffset = 7;
+	/*
+	var gamePos = $('#gamefield').offset();
+	var topOffset = gamePos.top;
+	var leftOffset = 2; //gamePos.left;
+	*/
 
 	var preferredCellSize = 60; // This is my preferred size for the jewels
 	if ($(window).width() > (preferredCellSize * cols)) {
@@ -196,6 +204,9 @@ $(document).ready(function() {
     function getCellIndex(position) {
 		cellRow = Math.floor((position.y - topOffset) / cellSize);
 		cellColumn = Math.floor((position.x - leftOffset) / cellSize);
+		
+		console.log('position(' + position.x + ', ' + position.y + ') --> ' + 
+		            'cell(' + cellColumn + ', ' + cellRow + ')') 
 		
         return { col: cellColumn, row: cellRow };
     }
@@ -443,7 +454,8 @@ $(document).ready(function() {
 					checkMoving();
 
 					// Update score
-					$("#score").text((parseInt($("#score").text())+10));
+					var score = parseInt($("#score").text());
+					$("#score").text(score+10);
 				}
 			});
 		});
@@ -454,8 +466,8 @@ $(document).ready(function() {
 		var xOffset = selectedCol - posX;
 		
 		// First the animation...
-		$("#gem_" + selectedRow + "_" + selectedCol).addClass("switch").attr("dir","-1");
-		$("#gem_" + posY + "_" + posX).addClass("switch").attr("dir","1");
+		$("#gem_" + selectedRow + "_" + selectedCol).addClass("switch").attr("dir", "-1");
+		$("#gem_" + posY + "_" + posX).addClass("switch").attr("dir", "1");
 		$.each($(".switch"), function() {
 			movingItems++;
 			$(this).animate({
@@ -471,7 +483,7 @@ $(document).ready(function() {
 		});
 
         // ...then the view update		
-		$("#gem_" + selectedRow + "_" + selectedCol).attr("id","temp");
+		$("#gem_" + selectedRow + "_" + selectedCol).attr("id", "temp");
 		$("#gem_" + posY + "_" + posX).attr("id","gem_" + selectedRow + "_" + selectedCol);
 		$("#temp").attr("id", "gem_" + posY + "_" + posX);
 		
@@ -578,39 +590,45 @@ function showAbout() {
 
 html, body {
 	background-color: black;
-}
-
-#header {
-	margin-top: 2px;
-	width: 100%;
-	height: 50px;
-	color: white;
+	margin: 0;
+	padding: 0;
 }
 
 a {
 	color: white;
 }
 
-#about-button {
-	position: absolute;
-	top: 5px;
-	left: 10px;
-	font-size: large;
+#header {
+    margin: 2px;
+	width: 100%;
+	color: white;
 }
+ 
+#header .left {
+    position: absolute;
+    top: 10px;
+    left: 5%;
+    font-size: large;
+ }
+ 
+#header .right {
+    position: absolute;
+    top: 10px;
+    right: 5%;
+    font-size: large;
+ }
 
-#replay-button {
-	position: absolute;
-	top: 5px;
-	right: 10px;
-	font-size: large;
-}
-
-#score {
+#header .center {
 	text-align: center;
 	font-size: xx-large;
 }
 
 #gamefield {
+    /*
+    margin-left: auto;
+    margin-right: auto;
+	height: 100%;
+	*/
 	width: 100%;
 	-webkit-user-select: none;
 }
@@ -668,9 +686,9 @@ a {
 	</div>
 
 	<div id="header">
-		<a href="#" id="about-button" type="button" onClick="showAbout();">About</a>
-		<div id="score">0</div>
-		<a href="#" id="replay-button" type="button" onClick="location.reload();">Replay</a>
+		<div class="left"><a href="#" type="button" onClick="showAbout();">About</a></div>
+		<div class="center"><span id="score">0</span></div>
+		<div class="right"><a href="#" type="button" onClick="location.reload();">Replay</a></div>
 	</div>
 
 	<div id="gamefield">
