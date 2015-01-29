@@ -1,0 +1,205 @@
+* {
+	margin: 0;
+}
+
+html, body {
+	background-color: black;
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: white;
+}
+
+#marker {
+    display: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 5px,
+    border: 2px solid white,
+  	position: absolute
+}
+
+.gem {
+	border: 2px solid white;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.jeweltype0 {
+	background-color: #75B2DD;
+	background-image: url(umaine.png)	;
+}
+
+.jeweltype1 {
+	background-color: rgba(0, 56, 147, 0.6);
+	background-image: url(usm.png);
+}
+
+.jeweltype2 {
+	background-color: #60C659;
+	background-image: url(uma.png);
+}
+
+.jeweltype3 {
+	background-color: maroon;
+	background-image: url(umf.png);
+}
+
+.jeweltype4 {
+	background-color: gold;
+	background-image: url(umpi.png);
+}
+
+.jeweltype5 {
+	background-color: green;
+	background-image: url(umm.png);
+}
+
+.jeweltype6 {
+	background-color: gold;
+	background-image: url(umfk.png);
+}
+
+.jeweltype7 {
+	background-color: white;
+	background-image: url(ums.png);
+}
+
+
+#header {
+    margin: 2px;
+	width: 100%;
+	color: white;
+}
+
+#header .left {
+    position: absolute;
+    top: 10px;
+    left: 5%;
+    font-size: large;
+ }
+
+#header .right {
+    position: absolute;
+    top: 10px;
+    right: 5%;
+    font-size: large;
+ }
+
+#header .center {
+	text-align: center;
+	font-size: xx-large;
+}
+
+#gamefield {
+    /*
+    margin-left: auto;
+    margin-right: auto;
+	height: 100%;
+	*/
+	width: 100%;
+	-webkit-user-select: none;
+}
+
+#splash {
+	display: none;
+}
+
+#about, #playfor {
+	display: none;
+	xwidth: 90%;
+}
+
+#playfor {
+	padding: 5px;
+	cursor : pointer,
+}
+
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
+
+#about ul, #playfor ul {
+	width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	text-align: center;
+}
+
+#about ul li, #playfor ul li {
+	display: inline-block;
+	margin: 2px auto;
+	background-image: none;
+	border: 2px solid grey;
+	border-radius: 5px;
+	width: 45%;
+	xheight: 80px;
+	vertical-align: top;
+}
+
+#about ul li a, #playfor ul li a {
+	display: block
+}
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen 
+    and (min-device-width : 320px) 
+    and (max-device-width : 480px) {
+    /* Styles */
+}
+
+/* Smartphones (landscape) ----------- */
+@media only screen 
+    and (min-width : 321px) {
+    /* Styles */
+}
+
+/* Smartphones (portrait) ----------- */
+@media only screen 
+    and (max-width : 320px) {
+    /* Styles */
+}
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen 
+    and (min-device-width : 768px) 
+    and (max-device-width : 1024px) {
+    /* Styles */
+}
+
+/* iPads (landscape) ----------- */
+@media only screen 
+    and (min-device-width : 768px) 
+    and (max-device-width : 1024px) 
+    and (orientation : landscape) {
+    /* Styles */
+}
+
+/* iPads (portrait) ----------- */
+@media only screen 
+    and (min-device-width : 768px) 
+    and (max-device-width : 1024px) 
+    and (orientation : portrait) {
+    /* Styles */
+}
+
+/* Desktops and laptops ----------- */
+@media only screen 
+    and (min-width : 1224px) {
+    /* Styles */
+}
+
+/* Large screens ----------- */
+@media only screen 
+and (min-width : 1824px) {
+/* Styles */
+}
+
+/* iPhone 4 ----------- */
+@media
+only screen and (-webkit-min-device-pixel-ratio : 1.5),
+only screen and (min-device-pixel-ratio : 1.5) {
+/* Styles */
+}
