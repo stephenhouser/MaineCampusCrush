@@ -19,6 +19,18 @@
 <script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js"></script>
 
 <script>
+/*
+
+FIXME: Tap on same cell twice swaps with cell on left.
+	If you tap on a cell, then tap on it again (the marker) and it tries
+	to swap	with the cell to the left.
+
+TODO: Location of gamefield is absolute and very fragile
+	Would be nicer to be set my HTML/CSS rather than wiggling around
+	in JavaScript.
+
+*/
+
 /* Disabled, see below
 var backgroundSound = 0;
 document.addEventListener('visibilitychange', function(){
