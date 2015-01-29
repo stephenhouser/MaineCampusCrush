@@ -14,11 +14,11 @@ a {
 
 #marker {
     display: none;
-    width: 60px;
-    height: 60px;
-    border-radius: 5px,
-    border: 2px solid white,
-  	position: absolute
+    width: 52px;
+    height: 52px;
+    border-radius: 5px;
+    border: 5px solid white;
+  	position: absolute;
 }
 
 .gem {

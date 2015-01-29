@@ -93,14 +93,6 @@ $(document).ready(function() {
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
 
-  	$("#marker").css({
-  		"width"         : markerSize + "px",
-  		"height"        : markerSize + "px",
-  		"border-radius" : "5px",
-  		"border"        : markerBorderSize + "px solid white",
-  		"position"      : "absolute"
-  	}).hide();
-
     // Attach swipe and tap handlers to marker
     $("#marker").swipe(swipeHandlers);
 
@@ -190,8 +182,12 @@ $(document).ready(function() {
 
             //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
 
+            var borderLeftWidth = parseInt($('#marker').css('border-left-width'), 10);
+            var borderTopWidth = parseInt($('#marker').css('border-top-width'), 10);
+			$("#marker")
+			    .css("top", position.y - borderTopWidth)
+			    .css("left", position.x - borderLeftWidth);
 			$("#marker").show();
-			$("#marker").css("top", position.y - markerBorderSize).css("left", position.x - markerBorderSize);
 
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
