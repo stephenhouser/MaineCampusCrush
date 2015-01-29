@@ -14,9 +14,15 @@
 <link rel="image_src" href="splash.png" />
 
 <meta name="format-detection" content="telephone=no">
-<script type="application/x-javascript" src="http://code.jquery.com/jquery.min.js"></script>
-<script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
-<script type="application/x-javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js"></script>
+
+<script type="application/x-javascript"
+	src="http://code.jquery.com/jquery.min.js"></script>
+<script type="application/x-javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
+<script type="application/x-javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js"></script>
+<script type="application/x-javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery.transit/0.9.12/jquery.transit.min.js"></script>
 
 <script>
 /* Disabled, see below
@@ -123,6 +129,11 @@ $(document).ready(function() {
             handleTap(event, target);
         }
     }
+
+	// Delegate .transition() calls to .animate()
+	// if the browser can't do CSS transitions.
+	if (!$.support.transition)
+	  $.fn.transition = $.fn.animate;
 
   	$("#marker").css({
   		"width"         : markerSize + "px",
@@ -427,7 +438,7 @@ $(document).ready(function() {
 
 		$.each($(".fall"), function() {
 			movingItems++;
-			$(this).animate({top: "+=" + cellSize }, {
+			$(this).transition({ top: "+=" + cellSize }, {
 			        duration: 150,
                     complete: function() {
                         $(this).removeClass("fall");
@@ -447,16 +458,18 @@ $(document).ready(function() {
 		$.each($(".remove"), function() {
 			clearSound.play();
 			movingItems++;
-			$(this).animate({ opacity:0	}, {
-				duration: 150,
-				complete: function() {
-					$(this).remove();
-					checkMoving();
+			$(this)
+				.transition({ scale: 1.25 }, { duration: 100 })
+				.transition({ opacity:0, scale: 0.1 }, {
+					duration: 150,
+					complete: function() {
+						$(this).remove();
+						checkMoving();
 
-					// Update score
-					var score = parseInt($("#score").text());
-					$("#score").text(score+10);
-				}
+						// Update score
+						var score = parseInt($("#score").text());
+						$("#score").text(score+10);
+					}
 			});
 		});
 	}
@@ -470,7 +483,7 @@ $(document).ready(function() {
 		$("#gem_" + posY + "_" + posX).addClass("switch").attr("dir", "1");
 		$.each($(".switch"), function() {
 			movingItems++;
-			$(this).animate({
+			$(this).transition( {
                     left: "+=" + xOffset * cellSize * $(this).attr("dir"),
                     top : "+=" + yOffset * cellSize * $(this).attr("dir")
 			    }, {
