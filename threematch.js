@@ -24,6 +24,7 @@ $(document).ready(function() {
 	var rows        = 8;    // Number of rows
   	var jewelTypes  = 8;    // Number of different types of "jewels"
 
+
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
 	var dropSound = new Howl({urls: ['drop.wav']});
@@ -56,7 +57,16 @@ $(document).ready(function() {
 	var leftOffset = gamePos.left + leftMargin;
 
     var cellSize = parseInt($('#marker').css('width'), 10)
-                    + parseInt($('#marker').css('margin'), 10) * 2;
+                    + (parseInt($('#marker').css('margin'), 10) * 2);
+
+    var gameOffset = $('#gamefield').offset();
+    var winHeight = $(window).height();
+    while ( winHeight < (cellSize * rows) + gameOffset.top) {
+        rows--;
+    }
+        
+
+
 
 	// Delegate .transition() calls to .animate()
 	// if the browser can't do CSS transitions.
