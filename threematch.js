@@ -55,8 +55,14 @@ $(document).ready(function() {
 	var topOffset = gamePos.top + topMargin;
 	var leftOffset = gamePos.left + leftMargin;
 
-    var cellSize = parseInt($('#marker').css('width'), 10)
-                    + (parseInt($('#marker').css('margin'), 10) * 2);
+    gameRect = document.getElementById("gamefield").getBoundingClientRect();
+    var cellSize = Math.floor((gameRect.width / cols));
+    var gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2) - 1;
+    
+    
+    //var cellSize = parseInt($('#marker').css('width'), 10)
+    //                + (parseInt($('#marker').css('margin'), 10) * 2);
+    console.log("2 --> " + gemSize);
 
     // Try to accomodate short phones by reducing the number of rows
     var gameOffset = $('#gamefield').offset();
@@ -124,16 +130,19 @@ $(document).ready(function() {
 	    topOffset = gamePos.top + topMargin;
 	    leftOffset = gamePos.left + leftMargin;
 	    
-        cellSize = parseInt($('#marker').css('width'), 10)
-                    + (parseInt($('#marker').css('margin'), 10) * 2);
+        //cellSize = parseInt($('#marker').css('width'), 10)
+        //            + (parseInt($('#marker').css('margin'), 10) * 2);
 
         // Reposition all gems to their new locations
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
                 var gemId = "gem_" + i +"_" + j;
                 $('#' + gemId).css({
-                    "top"  : (i * cellSize) + topOffset + "px",
-                    "left" : (j * cellSize) + leftOffset + "px"
+                    "top"    : (i * cellSize) + topOffset + "px",
+                    "left"   : (j * cellSize) + leftOffset + "px",
+                    "height" : gemSize + "px",
+                    "width"  : gemSize + "px",
+                    "background-size"  : gemSize + "px"
                 });
             }
         }
@@ -144,8 +153,11 @@ $(document).ready(function() {
         var gemId = "gem_" + row +"_" + col;
         $("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
         $('#' + gemId).addClass('jeweltype' + jewels[row][col]).css({
-            "top"               : (row * cellSize) + topOffset + "px",
-            "left"              : (col * cellSize) + leftOffset + "px"
+            "top"    : (row * cellSize) + topOffset + "px",
+            "left"   : (col * cellSize) + leftOffset + "px",
+            "height" : gemSize + "px",
+            "width"  : gemSize + "px",
+            "background-size"  : gemSize + "px"
         });
 
         // Attach swipe and tap handlers
