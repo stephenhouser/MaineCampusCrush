@@ -127,11 +127,7 @@ $(document).ready(function() {
 
 			$('#' + gemId).addClass('jeweltype' + jewels[i][j]).css({
 				"top"               : (i * cellSize) + topOffset + "px",
-				"left"              : (j * cellSize) + leftOffset + "px",
-				"width"             : gemSize + "px",
-				"height"            : gemSize + "px",
-				"position"          : "absolute",
-				"background-size"   : gemSize + "px",
+				"left"              : (j * cellSize) + leftOffset + "px"
 			});
 
             // Attach swipe and tap handlers
@@ -344,11 +340,7 @@ $(document).ready(function() {
 
           		$("#gem_0_"+i).addClass('jeweltype' + jewels[0][i]).css({
           			"top"               : topOffset + "px",
-          			"left"              : (i * cellSize) + leftOffset + "px",
-          			"width"             : gemSize + "px",
-          			"height"            : gemSize + "px",
-          			"position"          : "absolute",
-					"background-size"   : gemSize + "px",
+          			"left"              : (i * cellSize) + leftOffset + "px"
           		});
 
                 // Attache swipe and tap handlers
