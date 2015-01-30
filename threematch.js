@@ -604,11 +604,21 @@ $(document).ready(function main() {
 });
 
 function hideAbout() {
+    console.log("hideAbout");
 	$("#about").dialog('close');
+	window.scrollTo(0, 0);
 }
 
 function showAbout() {
-	$("#about").dialog({ width: "90%", });
+	$("#about").dialog({
+	    width: "90%",
+	    modal: true,
+	    buttons: {
+            Ok: function() {
+                hideAbout();
+            }
+        }
+    });
 }
 
 function hidePlayFor() {
@@ -621,5 +631,9 @@ function showPlayFor() {
 		draggable: false,
 		modal: true
 	});
+}
+
+function showHighScore() {
+    alert('high score');
 }
 

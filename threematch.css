@@ -39,6 +39,7 @@ a {
 #header .center {
 	text-align: center;
 	font-size: 350%;
+	cursor: pointer;
 }
 
 #footer {
