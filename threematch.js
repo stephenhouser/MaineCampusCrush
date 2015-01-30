@@ -48,9 +48,25 @@ $(document).ready(function() {
 
     // Initialize the visual marker -- where the player taps...
     var marker = $('#marker');
+    marker.hide(); // should be display: none in CSS already. Be safe.
     marker.swipe(swipeHandlers);
-    markerHide(); // should be display: none in CSS already. Be safe.
-
+    marker.showAtPosition = function(x, y) {
+        // Position the "marker" to show which cell we have selected.
+        var borderLeftWidth = parseInt(marker.css('border-left-width'), 10);
+        var marginLeft = parseInt(marker.css('margin-left'), 10);
+        var borderTopWidth = parseInt(marker.css('border-top-width'), 10);
+        var marginTop = parseInt(marker.css('margin-top'), 10);
+        
+        marker.css({
+            "top"    : (y - borderTopWidth - marginTop) + "px",
+            "left"   : (x - borderLeftWidth - marginLeft) + "px",
+            "height" : gemSize + "px",
+            "width"  : gemSize + "px"
+        });
+            
+        marker.show();
+    };
+    
     // Initialize the game grid -- where the player plays...
     var gameGrid = $('#gamefield');
     var _gameId = '#gamefield';
@@ -154,27 +170,6 @@ $(document).ready(function() {
         $('#' + gemId).swipe(swipeHandlers);        
     }
     
-    function markerShow(x, y) {
-        // Position the "marker" to show which cell we have selected.
-        var borderLeftWidth = parseInt(marker.css('border-left-width'), 10);
-        var marginLeft = parseInt(marker.css('margin-left'), 10);
-        var borderTopWidth = parseInt(marker.css('border-top-width'), 10);
-        var marginTop = parseInt(marker.css('margin-top'), 10);
-        
-        marker.css({
-            "top"    : (y - borderTopWidth - marginTop) + "px",
-            "left"   : (x - borderLeftWidth - marginLeft) + "px",
-            "height" : gemSize + "px",
-            "width"  : gemSize + "px"
-        });
-            
-        marker.show();
-    }
-        
-    function markerHide() {
-        marker.hide();
-    }
-
     function getPosition(element) {
         var xPosition = 0;
         var yPosition = 0;
@@ -199,13 +194,12 @@ $(document).ready(function() {
         return { col: cellColumn, row: cellRow };
     }
 
-
     function handleTap(event, target) {
         //console.log('handleTap(' + event + ', ' + target.id + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
 		if ('#'+target.id == marker.selector) {
-            markerHide();			
+            marker.hide();			
 			selectedRow = selectedCol = empty;
 			return;
 		}
@@ -217,7 +211,7 @@ $(document).ready(function() {
             //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
 
             // TODO: Animate the selected cell?
-            markerShow(position.x, position.y);
+            marker.showAtPosition(position.x, position.y);
 
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
@@ -230,7 +224,7 @@ $(document).ready(function() {
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-                    markerHide();
+                    marker.hide();
     				gameState = "switch";
 					gemSwitch();
 				} else {
@@ -249,7 +243,7 @@ $(document).ready(function() {
 			posY = position.y;
 			posX = position.x;
 
-            markerShow(position.x, position.y);
+            marker.showAtPosition(position.x, position.y);
 
 			selectSound.play();
 			posY = selectedRow = Math.floor( (posY - gameRect.top) / cellSize);
@@ -286,7 +280,7 @@ $(document).ready(function() {
             if (trySwitch) {
                 if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
                    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-                    markerHide();
+                    marker.hide();
                     gameState = "switch";
                     gemSwitch();
                 } else {
@@ -297,7 +291,7 @@ $(document).ready(function() {
                 // swiped out of bounds...
                 errorSound.play();
 
-                markerHide();
+                marker.hide();
                 posY = selectedRow = empty;
                 posX = selectedCol = empty;
             }
