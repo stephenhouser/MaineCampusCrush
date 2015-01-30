@@ -16,9 +16,7 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
-$(document).ready(function() {
-	//showPlayFor();
-
+$(document).ready(function main() {
     // These are the major configuration options
 	var cols        = 6;    // Number of columns
 	var rows        = 8;    // Number of rows
@@ -36,6 +34,15 @@ $(document).ready(function() {
   	var movingItems = 0;
   	var gameState = "pick";   // initial game state is picking a cell
 
+	// Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
+	if (!$.support.transition)
+	  $.fn.transition = $.fn.animate;
+
+    // Prevent any scrolling going on in the background...
+    document.addEventListener('touchmove', function preventScrolling(e) {
+        e.preventDefault();
+    }, false);
+
     // Swipe and tap handler callbacks for interaction
     var swipeHandlers = {
         swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
@@ -46,6 +53,7 @@ $(document).ready(function() {
         }
     }
 
+    // #mark Marker setup
     // Initialize the visual marker -- where the player taps...
     var marker = $('#marker');
     marker.hide(); // should be display: none in CSS already. Be safe.
@@ -65,8 +73,13 @@ $(document).ready(function() {
         });
             
         marker.show();
+        							        
+        // Select the cell!
+        //cell = getCellIndex({x: x, y: y});
+        //$('#' + "gem_" + cell.row +"_" + cell.col).addClass("selected");
     };
     
+    // #mark Game Board setup
     // Initialize the game grid -- where the player plays...
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
@@ -74,8 +87,8 @@ $(document).ready(function() {
     // Figure out where the game field has been positioned on the screen.
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
     var gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-    var cellSize = Math.floor((gameRect.width) / cols);
-    var gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
+    var cellSize = Math.floor((gameRect.width) / cols); 
+    var gemSize = cellSize - (parseInt(marker.css('margin-left'), 10) * 2);
     
     // Try to accomodate short phones by reducing the number of rows
     var gameOffset = gameGrid.offset();
@@ -84,11 +97,24 @@ $(document).ready(function() {
         rows--;
     }
 
-	// Delegate .transition() calls to .animate()
-	// if the browser can't do CSS transitions.
-	if (!$.support.transition)
-	  $.fn.transition = $.fn.animate;
+    $(window).resize(function handleWindowResize() {
+        //console.log('Resizing...');
+        
+        // Figure out where the game field has been positioned on the screen.
+        // Compute size of game grid (cellSize) and the gems inside them (gemSize)
+        gameRect = document.getElementById(gameGridId).getBoundingClientRect();
+        cellSize = Math.floor((gameRect.width) / cols);
+        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
 
+        // Reposition all gems to their new locations
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                repositionGem($("#gem_" + i +"_" + j), i, j);
+            }
+        }
+    });
+
+    // #mark Sound system initialization
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
 	var dropSound = new Howl({urls: ['drop.wav']});
@@ -110,44 +136,38 @@ $(document).ready(function() {
 		}).play();
 	*/
 
-    // Initialize all cells to -1 (empty)
-    // TODO: Do we need to pre-initialize all the cells this way?
-  	for (i = 0; i < rows; i++) {
-     	jewels[i] = new Array();
-     	for (j = 0; j < cols; j++) {
-          	jewels[i][j] = empty;
-     	}
-  	}
 
-    // Fill all cells
-	for (i = 0; i < rows; i++) {
-		for (j = 0; j < cols; j++) {
-		    // Fill cell with a random jewel that will NOT cause a "streak" (3-match)
-			do {
-				jewels[i][j] = Math.floor(Math.random() * jewelTypes);
-			} while (isStreak(i, j));
+    // #mark End initialization
+    resetGame();
+	//showPlayFor();
 
-            // Make and add the cell to the gamefield
-            makeGem(i, j);
-		}
-	}
-
-    $(window).resize(function() {
-        //console.log('Resizing...');
-        
-        // Figure out where the game field has been positioned on the screen.
-        // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-        gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-        cellSize = Math.floor((gameRect.width) / cols);
-        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
-
-        // Reposition all gems to their new locations
+    // #mark Document Functions
+    function resetGame() {
+        // Initialize all cells to -1 (empty)
+        // TODO: Do we need to pre-initialize all the cells this way?
         for (i = 0; i < rows; i++) {
+            jewels[i] = new Array();
             for (j = 0; j < cols; j++) {
-                repositionGem($("#gem_" + i +"_" + j), i, j);
+                jewels[i][j] = empty;
             }
         }
-    });
+
+        // Fill all cells
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                // Fill cell with a random jewel that will NOT cause a "streak" (3-match)
+                do {
+                    // The "system takes over" version
+                    // The system tiles (jewltype7) are not selected in setup.
+                    jewels[i][j] = Math.floor(Math.random() * (jewelTypes - 1));
+                    //jewels[i][j] = Math.floor(Math.random() * jewelTypes);
+                } while (isStreak(i, j));
+
+                // Make and add the cell to the gamefield
+                makeGem(i, j);
+            }
+        }
+    }
 
     function repositionGem(gem, row, col) {
         gem.css({
@@ -223,6 +243,7 @@ $(document).ready(function() {
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
+				    
                     marker.hide();
     				gameState = "switch";
 					gemSwitch();
@@ -502,6 +523,38 @@ $(document).ready(function() {
 
 		jewels[row][col] = empty;
 	}
+
+    // #mark Game Over (work in progress)
+    function checkHint() {
+        var possibleMoves = [];
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                //jewels[i][j] = empty;
+                if (getPossibleMoves(i, j)) {
+                    console.log('a move is possible');
+                }
+            }
+        }
+    }
+
+    function getPossibleMove(row, col) {
+        // Can make four possible moves
+        // left (col - 1)
+        if ((col - 1) >= 0) {
+        }
+        
+        // right (col + 1)
+        if ((col + 1) < cols) {
+        }
+        
+        // up  (row - 1)
+        if ((row - 1) >= 0) {
+        }
+        
+        // down (row + 1)
+        if ((row + 1) < rows) {
+        }
+    }
 
 	function isVerticalStreak(row, col) {
 		var gemValue = jewels[row][col];
