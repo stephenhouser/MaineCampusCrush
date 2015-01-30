@@ -24,7 +24,6 @@ $(document).ready(function() {
 	var rows        = 8;    // Number of rows
   	var jewelTypes  = 8;    // Number of different types of "jewels"
 
-
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
 	var dropSound = new Howl({urls: ['drop.wav']});
@@ -59,14 +58,12 @@ $(document).ready(function() {
     var cellSize = parseInt($('#marker').css('width'), 10)
                     + (parseInt($('#marker').css('margin'), 10) * 2);
 
+    // Try to accomodate short phones by reducing the number of rows
     var gameOffset = $('#gamefield').offset();
     var winHeight = $(window).height();
-    while ( winHeight < (cellSize * rows) + gameOffset.top) {
+    while (winHeight < (cellSize * rows) + gameOffset.top) {
         rows--;
     }
-        
-
-
 
 	// Delegate .transition() calls to .animate()
 	// if the browser can't do CSS transitions.
@@ -75,14 +72,11 @@ $(document).ready(function() {
 
 	var selectedRow = empty;
   	var selectedCol = empty;
-
-  	var posX;
-  	var posY;
+  	var posX = empty;
+  	var posY = empty;
 
   	var jewels = new Array(); // all the jewels
-
   	var movingItems = 0;
-
   	var gameState = "pick";   // initial game state is picking a cell
 
     // Swipe and tap handler callbacks for interaction
@@ -120,6 +114,30 @@ $(document).ready(function() {
             makeGem(i, j);
 		}
 	}
+
+    $(window).resize(function() {
+        //console.log('Resizing...');
+        
+        gamePos = $('#gamefield').position();
+        topMargin = parseInt($('#gamefield').css('margin-top'), 10);
+        leftMargin = parseInt($('#gamefield').css('margin-left'), 10);
+	    topOffset = gamePos.top + topMargin;
+	    leftOffset = gamePos.left + leftMargin;
+	    
+        cellSize = parseInt($('#marker').css('width'), 10)
+                    + (parseInt($('#marker').css('margin'), 10) * 2);
+
+        // Reposition all gems to their new locations
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                var gemId = "gem_" + i +"_" + j;
+                $('#' + gemId).css({
+                    "top"  : (i * cellSize) + topOffset + "px",
+                    "left" : (j * cellSize) + leftOffset + "px"
+                });
+            }
+        }
+    });
 
     function makeGem(row, col) {
         // Make and add the cell to the gamefield
