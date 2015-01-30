@@ -44,12 +44,10 @@ a {
 }
 
 #gamefield {
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     width: 45%;
     min-width: 485px;
-	xheight: 647px;
-	-webkit-user-select: none;
+    height: 100%;
 }
 
 .gem {
@@ -66,7 +64,7 @@ a {
 #marker {
     display: none;
 
-    border: 5px solid white;
+    border: 7px solid white;
 }
 
 .jeweltype0 {
@@ -181,7 +179,6 @@ a {
         margin-top: -3px;
         width: 98%;
         min-width: 0px;
-        height: 100%;
         -webkit-user-select: none;
     }
     
