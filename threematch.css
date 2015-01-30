@@ -17,9 +17,6 @@ a {
 }
 
 #header {
-    margin: 2px;
-    margin-left: auto;
-    margin-right: auto;
 	width: 100%;
 	color: white;
 }
@@ -41,6 +38,11 @@ a {
 #header .center {
 	text-align: center;
 	font-size: xx-large;
+}
+
+#footer {
+	width: 100%;
+	color: white;
 }
 
 #gamefield {
@@ -176,7 +178,6 @@ a {
     #gamefield {
         margin-left: auto;
         margin-right: auto;
-        margin-top: -3px;
         width: 98%;
         min-width: 0px;
         -webkit-user-select: none;
