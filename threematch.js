@@ -68,12 +68,12 @@ $(document).ready(function() {
     };
     
     // Initialize the game grid -- where the player plays...
-    var gameGrid = $('#gamefield');
-    var _gameId = '#gamefield';
+    var gameGridId = 'gamefield';
+    var gameGrid = $('#'+gameGridId);
 
     // Figure out where the game field has been positioned on the screen.
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var gameRect = document.getElementById('gamefield').getBoundingClientRect();
+    var gameRect = document.getElementById(gameGridId).getBoundingClientRect();
     var cellSize = Math.floor((gameRect.width) / cols);
     var gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
     
@@ -137,37 +137,36 @@ $(document).ready(function() {
         
         // Figure out where the game field has been positioned on the screen.
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-        gameRect = document.getElementById(_gameId).getBoundingClientRect();
+        gameRect = document.getElementById(gameGridId).getBoundingClientRect();
         cellSize = Math.floor((gameRect.width) / cols);
         gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
 
         // Reposition all gems to their new locations
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
-                var gemId = "gem_" + i +"_" + j;
-                $('#' + gemId).css({
-                    "top"    : (i * cellSize) + gameRect.top + "px",
-                    "left"   : (j * cellSize) + gameRect.left + "px",
-                    "height" : gemSize + "px",
-                    "width"  : gemSize + "px"
-                });
+                repositionGem($("#gem_" + i +"_" + j), i, j);
             }
         }
     });
 
-    function makeGem(row, col) {
-        // Make and add the cell to the gamefield
-        var gemId = "gem_" + row +"_" + col;
-        $(_gameId).append('<div class="gem" id="' + gemId + '"></div>');
-        $('#' + gemId).addClass('jeweltype' + jewels[row][col]).css({
+    function repositionGem(gem, row, col) {
+        gem.css({
             "top"    : (row * cellSize) + gameRect.top + "px",
             "left"   : (col * cellSize) + gameRect.left + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
+    }
 
-        // Attach swipe and tap handlers
-        $('#' + gemId).swipe(swipeHandlers);        
+    function makeGem(row, col) {
+        // Make and add the cell to the game grid
+        var gemId = "gem_" + row +"_" + col;
+        gameGrid.append('<div class="gem" id="' + gemId + '"></div>');
+        
+        gem = $('#' + gemId);
+        gem.addClass('jeweltype' + jewels[row][col]);
+        gem.swipe(swipeHandlers);        
+        repositionGem(gem, row, col);
     }
     
     function getPosition(element) {
