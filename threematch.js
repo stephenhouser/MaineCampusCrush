@@ -24,47 +24,8 @@ $(document).ready(function() {
 	var rows        = 8;    // Number of rows
   	var jewelTypes  = 8;    // Number of different types of "jewels"
 
-    // Sounds, using howler.js (howlerjs.com)
-	var clearSound = new Howl({urls: ['clear.wav']});
-	var dropSound = new Howl({urls: ['drop.wav']});
-	var selectSound = new Howl({urls: ['select.wav']});
-	var errorSound = new Howl({urls: ['error.wav']});
-
-	// Background sound.
-	// Background sound is disabled because it is not working correctly.
-	// Code above is designed to pause sound when the page is
-	// not being displayed. It works, but only after switching away and
-	// back to the page. That is, it does not pause the background sound
-	// the first time you switch away, only the second, third, etc...
-	/*
-	backgroundSound = new Howl({
-			urls: ['background.mp3'],
-			autoplay: true,
-			loop: true,
-			volume: 0.25
-		}).play();
-	*/
-
     // Constant to represent an empty cell or invalid selection
     var empty = -1;
-
-    // Figure out where the game field has been positioned on the screen.
-    // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var gameRect = document.getElementById("gamefield").getBoundingClientRect();
-    var cellSize = Math.floor((gameRect.width) / cols);
-    var gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2);
-    
-    // Try to accomodate short phones by reducing the number of rows
-    var gameOffset = $('#gamefield').offset();
-    var winHeight = $(window).height();
-    while (winHeight < (cellSize * rows) + gameOffset.top) {
-        rows--;
-    }
-
-	// Delegate .transition() calls to .animate()
-	// if the browser can't do CSS transitions.
-	if (!$.support.transition)
-	  $.fn.transition = $.fn.animate;
 
 	var selectedRow = empty;
   	var selectedCol = empty;
@@ -85,9 +46,53 @@ $(document).ready(function() {
         }
     }
 
-    // Set up the selection marker
-    var _markerId = 'marker';
-    markerInit();
+    // Initialize the visual marker -- where the player taps...
+    var marker = $('#marker');
+    marker.swipe(swipeHandlers);
+    markerHide(); // should be display: none in CSS already. Be safe.
+
+    // Initialize the game grid -- where the player plays...
+    var gameGrid = $('#gamefield');
+    var _gameId = '#gamefield';
+
+    // Figure out where the game field has been positioned on the screen.
+    // Compute size of game grid (cellSize) and the gems inside them (gemSize)
+    var gameRect = document.getElementById('gamefield').getBoundingClientRect();
+    var cellSize = Math.floor((gameRect.width) / cols);
+    var gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
+    
+    // Try to accomodate short phones by reducing the number of rows
+    var gameOffset = gameGrid.offset();
+    var winHeight = $(window).height();
+    while (winHeight < (cellSize * rows) + gameOffset.top) {
+        rows--;
+    }
+
+	// Delegate .transition() calls to .animate()
+	// if the browser can't do CSS transitions.
+	if (!$.support.transition)
+	  $.fn.transition = $.fn.animate;
+
+    // Sounds, using howler.js (howlerjs.com)
+	var clearSound = new Howl({urls: ['clear.wav']});
+	var dropSound = new Howl({urls: ['drop.wav']});
+	var selectSound = new Howl({urls: ['select.wav']});
+	var errorSound = new Howl({urls: ['error.wav']});
+
+	// Background sound.
+	// Background sound is disabled because it is not working correctly.
+	// Code above is designed to pause sound when the page is
+	// not being displayed. It works, but only after switching away and
+	// back to the page. That is, it does not pause the background sound
+	// the first time you switch away, only the second, third, etc...
+	/*
+	backgroundSound = new Howl({
+			urls: ['background.mp3'],
+			autoplay: true,
+			loop: true,
+			volume: 0.25
+		}).play();
+	*/
 
     // Initialize all cells to -1 (empty)
     // TODO: Do we need to pre-initialize all the cells this way?
@@ -116,9 +121,9 @@ $(document).ready(function() {
         
         // Figure out where the game field has been positioned on the screen.
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-        gameRect = document.getElementById("gamefield").getBoundingClientRect();
+        gameRect = document.getElementById(_gameId).getBoundingClientRect();
         cellSize = Math.floor((gameRect.width) / cols);
-        gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2);
+        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
 
         // Reposition all gems to their new locations
         for (i = 0; i < rows; i++) {
@@ -137,7 +142,7 @@ $(document).ready(function() {
     function makeGem(row, col) {
         // Make and add the cell to the gamefield
         var gemId = "gem_" + row +"_" + col;
-        $("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
+        $(_gameId).append('<div class="gem" id="' + gemId + '"></div>');
         $('#' + gemId).addClass('jeweltype' + jewels[row][col]).css({
             "top"    : (row * cellSize) + gameRect.top + "px",
             "left"   : (col * cellSize) + gameRect.left + "px",
@@ -148,35 +153,26 @@ $(document).ready(function() {
         // Attach swipe and tap handlers
         $('#' + gemId).swipe(swipeHandlers);        
     }
-
-    function markerInit() {
-        $('#'+_markerId).swipe(swipeHandlers);
-        markerHide(); // should be display: none in CSS already. Be safe.
-    }
-
+    
     function markerShow(x, y) {
         // Position the "marker" to show which cell we have selected.
-        var borderLeftWidth = parseInt($('#'+_markerId).css('border-left-width'), 10);
-        var marginLeft = parseInt($('#'+_markerId).css('margin-left'), 10);
-        var borderTopWidth = parseInt($('#'+_markerId).css('border-top-width'), 10);
-        var marginTop = parseInt($('#'+_markerId).css('margin-top'), 10);
+        var borderLeftWidth = parseInt(marker.css('border-left-width'), 10);
+        var marginLeft = parseInt(marker.css('margin-left'), 10);
+        var borderTopWidth = parseInt(marker.css('border-top-width'), 10);
+        var marginTop = parseInt(marker.css('margin-top'), 10);
         
-        $('#'+_markerId).css({
+        marker.css({
             "top"    : (y - borderTopWidth - marginTop) + "px",
             "left"   : (x - borderLeftWidth - marginLeft) + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
             
-        $('#'+_markerId).show();
+        marker.show();
     }
         
     function markerHide() {
-        $('#'+_markerId).hide();
-    }
-
-    function isMarker(target) {
-        return target == _markerId
+        marker.hide();
     }
 
     function getPosition(element) {
@@ -208,7 +204,7 @@ $(document).ready(function() {
         //console.log('handleTap(' + event + ', ' + target.id + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
-		if (isMarker(target.id)) {
+		if ('#'+target.id == marker.selector) {
             markerHide();			
 			selectedRow = selectedCol = empty;
 			return;

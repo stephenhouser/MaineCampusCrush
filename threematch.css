@@ -65,7 +65,6 @@ a {
 
 #marker {
     display: none;
-
     border: 7px solid white;
 }
 
@@ -190,7 +189,6 @@ a {
     }
     
     #marker {
-        border: 5px solid white;
     }
 }
 
