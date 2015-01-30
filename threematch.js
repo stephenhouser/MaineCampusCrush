@@ -50,28 +50,13 @@ $(document).ready(function() {
 
     // Get the game field somewhat where we want it.
     var gamePos = $('#gamefield').position();
-	var topOffset = gamePos.top;
-	var leftOffset = 7;
-	/*
-	var gamePos = $('#gamefield').offset();
-	var topOffset = gamePos.top;
-	var leftOffset = 2; //gamePos.left;
-	*/
+    var topMargin = parseInt($('#gamefield').css('margin-top'), 10);
+    var leftMargin = parseInt($('#gamefield').css('margin-left'), 10);
+	var topOffset = gamePos.top + topMargin;
+	var leftOffset = gamePos.left + leftMargin;
 
-	var preferredCellSize = 60; // This is my preferred size for the jewels
-	if ($(window).width() > (preferredCellSize * cols)) {
-		leftOffset = ($(window).width() - (preferredCellSize * cols)) / 2;
-	}
-
-    // Compute what we will actually use for the cell size
-	var cellSize = Math.floor(Math.min(preferredCellSize, (($(window).width() - (leftOffset * 2)) / cols)));
-
-    // Use this if you want to auto-calculate the number
-    // of rows that will fit on the screen rather than having it fixed (above)
-	//rows = Math.floor(($(window).height() - topOffset) / cellSize)
-
-    // Now figure out the size inside the cell -- where the jewel goes
-	var gemSize = Math.floor(cellSize * 0.865);
+    var cellSize = parseInt($('#marker').css('width'), 10)
+                    + parseInt($('#marker').css('margin'), 10) * 2;
 
 	// Delegate .transition() calls to .animate()
 	// if the browser can't do CSS transitions.
@@ -122,18 +107,22 @@ $(document).ready(function() {
 			} while (isStreak(i, j));
 
             // Make and add the cell to the gamefield
-            var gemId = "gem_" + i +"_" + j;
-			$("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
-
-			$('#' + gemId).addClass('jeweltype' + jewels[i][j]).css({
-				"top"               : (i * cellSize) + topOffset + "px",
-				"left"              : (j * cellSize) + leftOffset + "px"
-			});
-
-            // Attach swipe and tap handlers
-			$('#' + gemId).swipe(swipeHandlers);
+            makeGem(i, j);
 		}
 	}
+
+    function makeGem(row, col) {
+        // Make and add the cell to the gamefield
+        var gemId = "gem_" + row +"_" + col;
+        $("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
+        $('#' + gemId).addClass('jeweltype' + jewels[row][col]).css({
+            "top"               : (row * cellSize) + topOffset + "px",
+            "left"              : (col * cellSize) + leftOffset + "px"
+        });
+
+        // Attach swipe and tap handlers
+        $('#' + gemId).swipe(swipeHandlers);        
+    }
 
     function markerInit() {
         $('#'+_markerId).swipe(swipeHandlers);
@@ -143,10 +132,12 @@ $(document).ready(function() {
     function markerShow(x, y) {
         // Position the "marker" to show which cell we have selected.
         var borderLeftWidth = parseInt($('#'+_markerId).css('border-left-width'), 10);
+        var marginLeft = parseInt($('#'+_markerId).css('margin-left'), 10);
         var borderTopWidth = parseInt($('#'+_markerId).css('border-top-width'), 10);
+        var marginTop = parseInt($('#'+_markerId).css('margin-top'), 10);
         $('#'+_markerId)
-            .css("left", x - borderLeftWidth)
-            .css("top", y - borderTopWidth);
+            .css("left", x - borderLeftWidth - marginLeft)
+            .css("top", y - borderTopWidth - marginTop);
         $('#'+_markerId).show();
     }
         
@@ -333,19 +324,8 @@ $(document).ready(function() {
 
 		for (i = 0; i < cols; i++) {
 			if (jewels[0][i] == empty) {
-
 				jewels[0][i] = Math.floor(Math.random() * jewelTypes);
-
-          		$("#gamefield").append('<div class="gem" id="gem_0_' + i +'"></div>');
-
-          		$("#gem_0_"+i).addClass('jeweltype' + jewels[0][i]).css({
-          			"top"               : topOffset + "px",
-          			"left"              : (i * cellSize) + leftOffset + "px"
-          		});
-
-                // Attache swipe and tap handlers
-                $("#gem_0_"+i).swipe(swipeHandlers);
-
+                makeGem(0, i);
           		gemsPlaced++;
 				dropSound.play();
 			}
@@ -426,7 +406,7 @@ $(document).ready(function() {
 						checkMoving();
 
 						// Update score
-						var score = parseInt($("#score").text());
+						var score = parseInt($("#score").text(), 10);
 						$("#score").text(score+10);
 					}
 			});
