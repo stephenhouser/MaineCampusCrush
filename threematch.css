@@ -46,23 +46,19 @@ a {
 #gamefield {
     margin-left: auto;
     margin-right: auto;
-	width: 485px;
-	height: 647px;
+    width: 45%;
+    min-width: 485px;
+	xheight: 647px;
 	-webkit-user-select: none;
 }
 
 .gem {
     position: absolute;
-    width: 70px;
-    height: 70px;
     margin: 5px;
-	
 	border: 3px solid white;
-	border-radius: 5px;
-	
+	border-radius: 5px;	
 	cursor: pointer;
-	
-    background-size: 52px;    
+    background-size: 52px;
     background-repeat: no-repeat;
     background-position: center; 
 }
@@ -184,6 +180,7 @@ a {
         margin-right: auto;
         margin-top: -3px;
         width: 98%;
+        min-width: 0px;
         height: 100%;
         -webkit-user-select: none;
     }
