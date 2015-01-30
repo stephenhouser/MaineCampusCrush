@@ -48,8 +48,6 @@ $(document).ready(function() {
     // Constant to represent an empty cell or invalid selection
     var empty = -1;
 
-    var markerBorderSize = 5;
-
     // Get the game field somewhat where we want it.
     var gamePos = $('#gamefield').position();
 	var topOffset = gamePos.top;
@@ -75,26 +73,10 @@ $(document).ready(function() {
     // Now figure out the size inside the cell -- where the jewel goes
 	var gemSize = Math.floor(cellSize * 0.865);
 
-	// And the size of the highlighted marker
-	var markerSize = gemSize + 2;
-
-    // Swipe and tap handler callbacks for interaction
-    var swipeHandlers = {
-        swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-	        handleSwipe(event, event.changedTouches[0].target, direction);
-        },
-        tap:function(event, target) {
-            handleTap(event, target);
-        }
-    }
-
 	// Delegate .transition() calls to .animate()
 	// if the browser can't do CSS transitions.
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
-
-    // Attach swipe and tap handlers to marker
-    $("#marker").swipe(swipeHandlers);
 
 	var selectedRow = empty;
   	var selectedCol = empty;
@@ -107,6 +89,20 @@ $(document).ready(function() {
   	var movingItems = 0;
 
   	var gameState = "pick";   // initial game state is picking a cell
+
+    // Swipe and tap handler callbacks for interaction
+    var swipeHandlers = {
+        swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+            handleSwipe(event, event.changedTouches[0].target, direction);
+        },
+        tap:function(event, target) {
+            handleTap(event, target);
+        }
+    }
+
+    // Set up the selection marker
+    var _markerId = 'marker';
+    markerInit();
 
     // Initialize all cells to -1 (empty)
     // TODO: Do we need to pre-initialize all the cells this way?
@@ -143,6 +139,29 @@ $(document).ready(function() {
 		}
 	}
 
+    function markerInit() {
+        $('#'+_markerId).swipe(swipeHandlers);
+        markerHide(); // should be display: none in CSS already. Be safe.
+    }
+
+    function markerShow(x, y) {
+        // Position the "marker" to show which cell we have selected.
+        var borderLeftWidth = parseInt($('#'+_markerId).css('border-left-width'), 10);
+        var borderTopWidth = parseInt($('#'+_markerId).css('border-top-width'), 10);
+        $('#'+_markerId)
+            .css("left", x - borderLeftWidth)
+            .css("top", y - borderTopWidth);
+        $('#'+_markerId).show();
+    }
+        
+    function markerHide() {
+        $('#'+_markerId).hide();
+    }
+
+    function isMarker(target) {
+        return target.id == _markerId
+    }
+
     function getPosition(element) {
         var xPosition = 0;
         var yPosition = 0;
@@ -167,11 +186,13 @@ $(document).ready(function() {
         return { col: cellColumn, row: cellRow };
     }
 
+
     function handleTap(event, target) {
         //console.log('handleTap(' + event + ', ' + target.id + ')');
 
-		if (target.id == 'marker') {
-			$("#marker").hide();
+        // If the marker gets selected (e.g. same cell tapped twice) unselect it.
+		if (isMarker(target.id)) {
+            markerHide();			
 			selectedRow = selectedCol = empty;
 			return;
 		}
@@ -182,12 +203,8 @@ $(document).ready(function() {
 
             //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
 
-            var borderLeftWidth = parseInt($('#marker').css('border-left-width'), 10);
-            var borderTopWidth = parseInt($('#marker').css('border-top-width'), 10);
-			$("#marker")
-			    .css("top", position.y - borderTopWidth)
-			    .css("left", position.x - borderLeftWidth);
-			$("#marker").show();
+            // TODO: Animate the selected cell?
+            markerShow(position.x, position.y);
 
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
@@ -200,8 +217,8 @@ $(document).ready(function() {
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-					$("#marker").hide();
-					gameState = "switch";
+                    markerHide();
+    				gameState = "switch";
 					gemSwitch();
 				} else {
 					selectedRow = posY;
@@ -215,11 +232,11 @@ $(document).ready(function() {
         //console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
 
 		if (gameState == "pick") {
-		    var pos = getPosition(target);
-			posY = pos.y;
-			posX = pos.x;
-			$("#marker").show();
-			$("#marker").css("top", posY - markerBorderSize).css("left", posX - markerBorderSize);
+		    var position = getPosition(target);
+			posY = position.y;
+			posX = position.x;
+
+            markerShow(position.x, position.y);
 
 			selectSound.play();
 			posY = selectedRow = Math.floor( (posY - topOffset) / cellSize);
@@ -256,7 +273,7 @@ $(document).ready(function() {
             if (trySwitch) {
                 if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
                    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-                    $("#marker").hide();
+                    markerHide();
                     gameState = "switch";
                     gemSwitch();
                 } else {
@@ -267,7 +284,7 @@ $(document).ready(function() {
                 // swiped out of bounds...
                 errorSound.play();
 
-                $("#marker").hide();
+                markerHide();
                 posY = selectedRow = empty;
                 posX = selectedCol = empty;
             }
