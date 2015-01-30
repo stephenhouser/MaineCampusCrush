@@ -151,6 +151,7 @@ a {
 
 
 /* iPhone 4 and 4s ----------- */
+/*
 @media only screen
     and (max-device-height : 480px) {
     #header {
@@ -170,6 +171,7 @@ a {
         font-size: x-large;
     }
 }
+*/
 
 /* iPhone 5 and 5s ----------- */
 @media only screen 
@@ -180,16 +182,15 @@ a {
     #gamefield {
         margin-left: auto;
         margin-right: auto;
-        xwidth: 310px;
-        width: 100%;
+        margin-top: -3px;
+        width: 98%;
         height: 100%;
         -webkit-user-select: none;
     }
+    
     .gem {
-        xwidth: 45px;
-        xheight: 45px;
         margin: 3px;
-        xbackground-size: 45px;
+        background-size: 95%;
        	border: 2px solid white;
     }
     
@@ -198,10 +199,10 @@ a {
     }
 }
 
+/*
 @media only screen 
     and (min-device-width : 350px) 
     and (max-device-width : 374px) {
-    /* Styles */
     
     #gamefield {
         margin-left: auto;
@@ -223,12 +224,13 @@ a {
         border: 5px solid white;
     }
 }
+*/
 
 /* iPhone 6 ----------- */
+/*
 @media only screen 
     and (min-device-width : 375px) 
     and (max-device-width : 413px) {
-    /* Styles */
     
     #gamefield {
         margin-top: 10px;
@@ -251,12 +253,13 @@ a {
         border: 5px solid white;
     }
 }
+*/
 
 /* iPhone 6 Plus */
+/*
 @media only screen 
     and (min-device-width : 414px) 
     and (max-device-width : 480px) {
-    /* Styles */
     
     #gamefield {
         margin-top: 10px;
@@ -278,58 +281,66 @@ a {
         border: 5px solid white;
     }
 }
-
+*/
 
 /* Smartphones (landscape) ----------- */
+/*
 @media only screen 
     and (min-width : 321px) {
-    /* Styles */
 }
+*/
 
 /* Smartphones (portrait) ----------- */
+/*
 @media only screen 
     and (max-width : 320px) {
-    /* Styles */
 }
+*/
 
 /* iPads (portrait and landscape) ----------- */
+/*
 @media only screen 
     and (min-device-width : 768px) 
     and (max-device-width : 1024px) {
-    /* Styles */
 }
+*/
 
 /* iPads (landscape) ----------- */
+/*
 @media only screen 
     and (min-device-width : 768px) 
     and (max-device-width : 1024px) 
     and (orientation : landscape) {
-    /* Styles */
 }
+*/
 
 /* iPads (portrait) ----------- */
+/*
 @media only screen 
     and (min-device-width : 768px) 
     and (max-device-width : 1024px) 
     and (orientation : portrait) {
-    /* Styles */
 }
+*/
 
 /* Desktops and laptops ----------- */
+/*
 @media only screen 
     and (min-width : 1224px) {
-    /* Styles */
 }
+*/
 
 /* Large screens ----------- */
+/*
 @media only screen 
     and (min-width : 1824px) {
-    /* Styles */
 }
+*/
 
 /* iPhone 4 ----------- */
+/*
 @media
     only screen and (-webkit-min-device-pixel-ratio : 1.5),
     only screen and (min-device-pixel-ratio : 1.5) {
-    /* Styles */
 }
+*/

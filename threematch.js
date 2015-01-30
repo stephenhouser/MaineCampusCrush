@@ -48,22 +48,12 @@ $(document).ready(function() {
     // Constant to represent an empty cell or invalid selection
     var empty = -1;
 
-    // Get the game field somewhat where we want it.
-    var gamePos = $('#gamefield').position();
-    var topMargin = parseInt($('#gamefield').css('margin-top'), 10);
-    var leftMargin = parseInt($('#gamefield').css('margin-left'), 10);
-	var topOffset = gamePos.top + topMargin;
-	var leftOffset = gamePos.left + leftMargin;
-
-    gameRect = document.getElementById("gamefield").getBoundingClientRect();
-    var cellSize = Math.floor((gameRect.width / cols));
-    var gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2) - 1;
+    // Figure out where the game field has been positioned on the screen.
+    // Compute size of game grid (cellSize) and the gems inside them (gemSize)
+    var gameRect = document.getElementById("gamefield").getBoundingClientRect();
+    var cellSize = Math.floor((gameRect.width) / cols);
+    var gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2);
     
-    
-    //var cellSize = parseInt($('#marker').css('width'), 10)
-    //                + (parseInt($('#marker').css('margin'), 10) * 2);
-    console.log("2 --> " + gemSize);
-
     // Try to accomodate short phones by reducing the number of rows
     var gameOffset = $('#gamefield').offset();
     var winHeight = $(window).height();
@@ -124,25 +114,21 @@ $(document).ready(function() {
     $(window).resize(function() {
         //console.log('Resizing...');
         
-        gamePos = $('#gamefield').position();
-        topMargin = parseInt($('#gamefield').css('margin-top'), 10);
-        leftMargin = parseInt($('#gamefield').css('margin-left'), 10);
-	    topOffset = gamePos.top + topMargin;
-	    leftOffset = gamePos.left + leftMargin;
-	    
-        //cellSize = parseInt($('#marker').css('width'), 10)
-        //            + (parseInt($('#marker').css('margin'), 10) * 2);
+        // Figure out where the game field has been positioned on the screen.
+        // Compute size of game grid (cellSize) and the gems inside them (gemSize)
+        gameRect = document.getElementById("gamefield").getBoundingClientRect();
+        cellSize = Math.floor((gameRect.width) / cols);
+        gemSize = cellSize - (parseInt($('#marker').css('margin'), 10) * 2);
 
         // Reposition all gems to their new locations
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
                 var gemId = "gem_" + i +"_" + j;
                 $('#' + gemId).css({
-                    "top"    : (i * cellSize) + topOffset + "px",
-                    "left"   : (j * cellSize) + leftOffset + "px",
+                    "top"    : (i * cellSize) + gameRect.top + "px",
+                    "left"   : (j * cellSize) + gameRect.left + "px",
                     "height" : gemSize + "px",
-                    "width"  : gemSize + "px",
-                    "background-size"  : gemSize + "px"
+                    "width"  : gemSize + "px"
                 });
             }
         }
@@ -153,11 +139,10 @@ $(document).ready(function() {
         var gemId = "gem_" + row +"_" + col;
         $("#gamefield").append('<div class="gem" id="' + gemId + '"></div>');
         $('#' + gemId).addClass('jeweltype' + jewels[row][col]).css({
-            "top"    : (row * cellSize) + topOffset + "px",
-            "left"   : (col * cellSize) + leftOffset + "px",
+            "top"    : (row * cellSize) + gameRect.top + "px",
+            "left"   : (col * cellSize) + gameRect.left + "px",
             "height" : gemSize + "px",
-            "width"  : gemSize + "px",
-            "background-size"  : gemSize + "px"
+            "width"  : gemSize + "px"
         });
 
         // Attach swipe and tap handlers
@@ -175,9 +160,14 @@ $(document).ready(function() {
         var marginLeft = parseInt($('#'+_markerId).css('margin-left'), 10);
         var borderTopWidth = parseInt($('#'+_markerId).css('border-top-width'), 10);
         var marginTop = parseInt($('#'+_markerId).css('margin-top'), 10);
-        $('#'+_markerId)
-            .css("left", x - borderLeftWidth - marginLeft)
-            .css("top", y - borderTopWidth - marginTop);
+        
+        $('#'+_markerId).css({
+            "top"    : (y - borderTopWidth - marginTop) + "px",
+            "left"   : (x - borderLeftWidth - marginLeft) + "px",
+            "height" : gemSize + "px",
+            "width"  : gemSize + "px"
+        });
+            
         $('#'+_markerId).show();
     }
         
@@ -186,7 +176,7 @@ $(document).ready(function() {
     }
 
     function isMarker(target) {
-        return target.id == _markerId
+        return target == _markerId
     }
 
     function getPosition(element) {
@@ -204,8 +194,8 @@ $(document).ready(function() {
     }
 
     function getCellIndex(position) {
-		cellRow = Math.floor((position.y - topOffset) / cellSize);
-		cellColumn = Math.floor((position.x - leftOffset) / cellSize);
+		cellRow = Math.floor((position.y - gameRect.top) / cellSize);
+		cellColumn = Math.floor((position.x - gameRect.left) / cellSize);
 
 		//console.log('position(' + position.x + ', ' + position.y + ') --> ' +
 		//            'cell(' + cellColumn + ', ' + cellRow + ')')
@@ -266,8 +256,8 @@ $(document).ready(function() {
             markerShow(position.x, position.y);
 
 			selectSound.play();
-			posY = selectedRow = Math.floor( (posY - topOffset) / cellSize);
-			posX = selectedCol = Math.floor( (posX - leftOffset) / cellSize);
+			posY = selectedRow = Math.floor( (posY - gameRect.top) / cellSize);
+			posX = selectedCol = Math.floor( (posX - gameRect.left) / cellSize);
 
             var trySwitch = false;
             switch (direction) {
