@@ -39,9 +39,13 @@ $(document).ready(function main() {
 	  $.fn.transition = $.fn.animate;
 
     // Prevent any scrolling going on in the background...
+    /*
     document.addEventListener('touchmove', function preventScrolling(e) {
-        e.preventDefault();
+       	if (!$("#about").is(":visible")) {
+            e.preventDefault();
+        }
     }, false);
+    */
 
     // Swipe and tap handler callbacks for interaction
     var swipeHandlers = {
