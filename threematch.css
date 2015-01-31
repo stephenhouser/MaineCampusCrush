@@ -38,9 +38,18 @@ a {
 
 #header .center {
 	text-align: center;
-	font-size: 350%;
-	cursor: pointer;
+	font-size: 350%;	
 }
+
+#header .center a {
+    /*
+    display: inline-block;
+    border: 1px solid grey;
+    min-width: 25%;
+    */
+    text-decoration: none;
+}
+
 
 #footer {
 	width: 100%;
@@ -141,9 +150,8 @@ a {
 }
 
 
-#about, #playfor {
+#about, #playfor, #highscore {
 	display: none;
-	xwidth: 90%;
 }
 
 #playfor {
@@ -175,6 +183,54 @@ a {
 #about ul li a, #playfor ul li a {
 	display: block
 }
+
+#highscore {
+    padding: 0px;
+}
+
+#highscore ul {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    padding: 0px;
+}
+
+#highscore ul li {
+    background-repeat: no-repeat;
+    border: 2px solid white;
+    border-radius: 5px;
+    margin: 2px;
+    list-style-type: none;
+    height: 44px;
+    background-size: 44px;
+}
+
+#highscore ul li.myhiscore {
+    list-style-type: none;
+    height: 30px;
+}
+#highscore ul li.myhiscore p {
+    margin-left: 10px;
+    font-size: medium;
+}
+
+
+#highscore ul li p {
+    font-weight: bold;
+    font-size: x-large;
+    
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 48px;
+}
+
+#highscore ul li .hiscore {
+    float: right;
+    display: inline-block;
+    margin: 5px;
+    font-weight: normal;     
+}
+
 
 
 /* iPhone 4 and 4s ----------- */

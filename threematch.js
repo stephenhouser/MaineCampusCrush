@@ -603,20 +603,19 @@ $(document).ready(function main() {
 	}
 });
 
-function hideAbout() {
-    console.log("hideAbout");
-	$("#about").dialog('close');
-	window.scrollTo(0, 0);
-}
-
 function showAbout() {
 	$("#about").dialog({
 	    width: "90%",
 	    modal: true,
 	    buttons: {
             Ok: function() {
-                hideAbout();
+                $('#about').dialog('close');
             }
+        },
+        close: function onCloseAbout() {
+            console.log('hideAbout');
+            // ensure we are at the top of the window or things get screwy
+    	    window.scrollTo(0, 0);
         }
     });
 }
@@ -629,11 +628,28 @@ function showPlayFor() {
 	$("#playfor").dialog({
 		dialogClass: 'no-close',
 		draggable: false,
-		modal: true
+		modal: true,
+        close: function onClosePlayFor() {
+            // ensure we are at the top of the window or things get screwy
+    	    window.scrollTo(0, 0);
+        }
 	});
 }
 
 function showHighScore() {
-    alert('high score');
+	$("#highscore").dialog({
+	    /*
+	    modal: true,
+	    buttons: {
+            Ok: function() {
+                $("#highscore").dialog('close');
+            }
+        },
+        */
+        close: function onCloseHighScore() {
+            // ensure we are at the top of the window or things get screwy
+    	    window.scrollTo(0, 0);
+        }
+    });
 }
 
