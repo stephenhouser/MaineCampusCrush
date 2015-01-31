@@ -104,23 +104,26 @@ $(document).ready(function main() {
         rows--;
     }
 
-    $(window).resize(function handleWindowResize() {
-        //console.log('Resizing...');
+    // Handle window resizing on "desktop" browsers
+    if (!(/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent)) {
+        $(window).resize(function handleWindowResize() {
+            //console.log('Resizing...');
         
-        // Figure out where the game field has been positioned on the screen.
-        // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-        gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-        cellSize = Math.floor((gameRect.width) / cols);
-        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
+            // Figure out where the game field has been positioned on the screen.
+            // Compute size of game grid (cellSize) and the gems inside them (gemSize)
+            gameRect = document.getElementById(gameGridId).getBoundingClientRect();
+            cellSize = Math.floor((gameRect.width) / cols);
+            gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
 
-        // Reposition all gems to their new locations
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                repositionGem($("#gem_" + i +"_" + j), i, j);
+            // Reposition all gems to their new locations
+            for (i = 0; i < rows; i++) {
+                for (j = 0; j < cols; j++) {
+                    repositionGem($("#gem_" + i +"_" + j), i, j);
+                }
             }
-        }
-    });
-
+        });
+    }
+    
     // #mark Sound system initialization
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
@@ -630,7 +633,6 @@ function showAbout() {
             });
         },
         close: function onCloseAbout() {
-            console.log('close about');
             // ensure we are at the top of the window or things get screwy
     	    window.scrollTo(0, 0);
         }
