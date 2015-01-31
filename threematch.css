@@ -55,6 +55,7 @@ a {
 #gamefield {
     margin: auto;
     width: 50%;
+    min-width: 320px;
     height: 90%;
 
     background-color: grey;
@@ -67,7 +68,7 @@ a {
 	border: 3px solid white;
 	border-radius: 5px;	
 	cursor: pointer;
-    background-size: 52px;
+    background-size: 90%; /*52px;*/
     background-repeat: no-repeat;
     background-position: center; 
 }
