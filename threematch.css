@@ -252,6 +252,7 @@ ul#teamscores li .score {
 }
 
 /* iPhone 4 and 4s ----------- */
+/*
 @media only screen
     and (max-device-height : 480px) {
     
@@ -264,6 +265,7 @@ ul#teamscores li .score {
         font-size: large;
     }
 }
+*/
 
 /* iPhone > =5 ----------- */
 @media only screen 
@@ -277,7 +279,6 @@ ul#teamscores li .score {
     #header .center {
     	font-size: xx-large;
     }
-
 
     #gamefield {
         margin-left: auto;

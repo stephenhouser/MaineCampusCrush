@@ -6,6 +6,27 @@ TODO: Location of gamefield is absolute and very fragile
 
 */
 
+// These are the major configuration options
+var cols         = 6;   // Number of columns
+var rows         = 8;   // Number of rows
+var jewelScore   = 10;  // Score for a single jewel
+var jewelTypes   = 8;   // Number of different types of "jewels"
+
+// Constants
+var empty = -1;         // representation of empty cell or invalid selection
+
+// Internal variables
+var currentScore = 0;   // Current game score
+
+var selectedRow = empty;    // Currently selected (highlighted) row
+var selectedCol = empty;    // Currently selected (highlighted) column
+var posX = empty;           // Second selected (for swap) row
+var posY = empty;           // Second selected (for swap) column
+
+var jewels = new Array();   // All the jewels
+var movingItems = 0;        // Number of jewels currently moving around
+var gameState = "pick";     // Game state; initial state is picking a cell
+
 /* Disabled, see below
 var backgroundSound = 0;
 document.addEventListener('visibilitychange', function(){
@@ -16,49 +37,18 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
-var jewelScore   = 10;
-var jewelTypes   = 8;    // Number of different types of "jewels"
-var currentScore = 0;
-
 $(document).ready(function main() {
-    // These are the major configuration options
-	var cols        = 6;    // Number of columns
-	var rows        = 8;    // Number of rows
-
-    // Constant to represent an empty cell or invalid selection
-    var empty = -1;
-
-	var selectedRow = empty;
-  	var selectedCol = empty;
-  	var posX = empty;
-  	var posY = empty;
-
-  	var jewels = new Array(); // all the jewels
-  	var movingItems = 0;
-  	var gameState = "pick";   // initial game state is picking a cell
-
 	// Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
 
-    // Prevent any scrolling going on in the background...
-    /*
-    document.addEventListener('touchmove', function preventScrolling(e) {
-       	if (!$("#about").is(":visible")) {
-            e.preventDefault();
-        }
-    }, false);
-    */
-
     // Swipe and tap handler callbacks for interaction
     var swipeHandlers = {
         swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-            var target = event.changedTouches[0];
-            handleSwipe(event, $(target), direction);
+            handleSwipe($(event.target), direction);
         },
         tap:function(event, target) {
-            console.log('tapHandler ' + event + target);
-            handleTap(event, $(target));
+            handleTap($(target));
         }
     }
 
@@ -93,29 +83,32 @@ $(document).ready(function main() {
     var gemSize = cellSize - (parseInt(marker.css('margin-left'), 10) * 2);
     
     // Try to accomodate short phones by reducing the number of rows
+    /*
     var gameOffset = gameGrid.offset();
     var winHeight = $(window).height();
     while (winHeight < (cellSize * rows) + gameOffset.top) {
         rows--;
     }
+    */
     
     $(window).resize(function handleWindowResize() {
         console.log('Resizing...');
+        
         //var isMobile = (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
         var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
         var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
         
         if (isMobile) {
-            if (isLandscape) {
-                $('#landscape-error').show();
-                gameGrid.hide();
-            } else {
-                $('#landscape-error').hide();
-                gameGrid.show();
-            }
+            //if (isLandscape) {
+            //    $('#landscape-error').show();
+            //    gameGrid.hide();
+            //} else {
+            //    $('#landscape-error').hide();
+            //    gameGrid.show();
+            //}
             return;
         }
-
+        
         // Figure out where the game field has been positioned on the screen.
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)
         gameRect = document.getElementById(gameGridId).getBoundingClientRect();
@@ -128,6 +121,9 @@ $(document).ready(function main() {
                 repositionGem($("#gem_" + i +"_" + j), i, j);
             }
         }
+        
+        // TODO: Reposition marker as well.
+        
     });
     
     // #mark Sound system initialization
@@ -233,8 +229,8 @@ $(document).ready(function main() {
         return { col: cellColumn, row: cellRow };
     }
 
-    function handleTap(event, target) {
-        console.log('handleTap(' + event + ', ' + target + ')');
+    function handleTap(target) {
+        console.log('handleTap(' + target + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
 		if (target.is(marker)) {
@@ -249,8 +245,6 @@ $(document).ready(function main() {
             var targetRow = parseInt(targetId[1], 10);
             var targetCol = parseInt(targetId[2], 10);
  		    
-            console.log('handleTap (' + targetCol + ', ' + targetRow + ')');
-
             // TODO: Animate the selected cell?
             marker.showAtCell(target);
 
@@ -277,20 +271,19 @@ $(document).ready(function main() {
 		}
     }
 
-    function handleSwipe(event, target, direction) {
-        //console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
+    function handleSwipe(target, direction) {
+        console.log('handleSwipe(' + target + ', ' + direction + ')');
 
 		if (gameState == "pick") {
-		    var position = getPosition(target);
-			posY = position.y;
-			posX = position.x;
-
-            marker.showAtPosition(position.x, position.y);
-
+ 		    // Row and column are encoded in cell's id
+ 		    var targetId = target.attr('id').split('_');
+            posY = selectedRow = parseInt(targetId[1], 10);
+   			posX = selectedCol = parseInt(targetId[2], 10);
+ 		    
+            // TODO: Animate the selected cell?
+            marker.showAtCell(target);
 			selectSound.play();
-			posY = selectedRow = Math.floor( (posY - gameRect.top) / cellSize);
-			posX = selectedCol = Math.floor( (posX - gameRect.left) / cellSize);
-
+			
             var trySwitch = false;
             switch (direction) {
                 case "up":
