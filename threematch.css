@@ -6,7 +6,6 @@ html, body {
 	background-color: black;
 	margin: 0;
 	padding: 0;
-    -webkit-user-select: none;
 }
 
 a {
@@ -46,26 +45,25 @@ a {
     text-decoration: none;
 }
 
-
 #footer {
 	width: 100%;
 	color: white;
 }
 
 #gamefield {
+    position: relative;
     margin: auto;
-    width: 45%;
-    min-width: 485px;
-    overflow: hidden;
-}
+    width: 50%;
+    height: 100%;
 
-#landscape-error {
-    height: 75%;
-    font-size: xx-large;
-    color: red;
-    display: none;
-    margin: 10%;
-    text-align: center;
+    min-width: 320px;
+
+    /* overflow: hidden; */
+    
+    -webkit-user-select: none; /* prevent from selecting text */
+
+    /* debug */
+    /* background-color: grey; */
 }
 
 .gem {
@@ -74,7 +72,7 @@ a {
 	border: 3px solid white;
 	border-radius: 5px;	
 	cursor: pointer;
-    background-size: 52px;
+    background-size: 90%; /*52px;*/
     background-repeat: no-repeat;
     background-position: center; 
 }
@@ -109,6 +107,7 @@ a {
 #marker {
     display: none;
     border: 7px solid white;
+    z-index: 1;
 
     -webkit-animation: markeranimation 250ms infinite alternate;
     -moz-animation: markeranimation 250ms infinite alternate;    
@@ -252,6 +251,7 @@ ul#teamscores li .score {
 }
 
 /* iPhone 4 and 4s ----------- */
+/*
 @media only screen
     and (max-device-height : 480px) {
     
@@ -264,10 +264,11 @@ ul#teamscores li .score {
         font-size: large;
     }
 }
+*/
 
 /* iPhone > =5 ----------- */
 @media only screen 
-    and (min-device-width : 320px) 
+    and (min-device-width : 320px)
     and (max-device-width : 480px) {
     
     #header .left, #header .right {
@@ -278,13 +279,10 @@ ul#teamscores li .score {
     	font-size: xx-large;
     }
 
-
     #gamefield {
-        margin-left: auto;
-        margin-right: auto;
         width: 98%;
-        min-width: 0px;
-        -webkit-user-select: none;
+        min-width: 310px;
+        height: 98%;
     }
     
     .gem {

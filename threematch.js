@@ -1,10 +1,27 @@
 /*
 
-TODO: Location of gamefield is absolute and very fragile
-	Would be nicer to be set my HTML/CSS rather than wiggling around
-	in JavaScript.
-
 */
+
+// These are the major configuration options
+var cols         = 6;   // Number of columns
+var rows         = 8;   // Number of rows
+var jewelScore   = 10;  // Score for a single jewel
+var jewelTypes   = 8;   // Number of different types of "jewels"
+
+// Constants
+var empty = -1;         // representation of empty cell or invalid selection
+
+// Internal variables
+var currentScore = 0;   // Current game score
+
+var selectedRow = empty;    // Currently selected (highlighted) row
+var selectedCol = empty;    // Currently selected (highlighted) column
+var posX = empty;           // Second selected (for swap) row
+var posY = empty;           // Second selected (for swap) column
+
+var jewels = new Array();   // All the jewels
+var movingItems = 0;        // Number of jewels currently moving around
+var gameState = "pick";     // Game state; initial state is picking a cell
 
 /* Disabled, see below
 var backgroundSound = 0;
@@ -16,47 +33,18 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
-var jewelScore   = 10;
-var jewelTypes   = 8;    // Number of different types of "jewels"
-var currentScore = 0;
-
 $(document).ready(function main() {
-    // These are the major configuration options
-	var cols        = 6;    // Number of columns
-	var rows        = 8;    // Number of rows
-
-    // Constant to represent an empty cell or invalid selection
-    var empty = -1;
-
-	var selectedRow = empty;
-  	var selectedCol = empty;
-  	var posX = empty;
-  	var posY = empty;
-
-  	var jewels = new Array(); // all the jewels
-  	var movingItems = 0;
-  	var gameState = "pick";   // initial game state is picking a cell
-
 	// Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
 
-    // Prevent any scrolling going on in the background...
-    /*
-    document.addEventListener('touchmove', function preventScrolling(e) {
-       	if (!$("#about").is(":visible")) {
-            e.preventDefault();
-        }
-    }, false);
-    */
-
     // Swipe and tap handler callbacks for interaction
     var swipeHandlers = {
         swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-            handleSwipe(event, event.changedTouches[0].target, direction);
+            handleSwipe($(event.target), direction);
         },
         tap:function(event, target) {
-            handleTap(event, target);
+            handleTap($(target));
         }
     }
 
@@ -65,25 +53,18 @@ $(document).ready(function main() {
     var marker = $('#marker');
     marker.hide(); // should be display: none in CSS already. Be safe.
     marker.swipe(swipeHandlers);
-    marker.showAtPosition = function(x, y) {
+    marker.showAtCell = function(targetCell) {
         // Position the "marker" to show which cell we have selected.
-        var borderLeftWidth = parseInt(marker.css('border-left-width'), 10);
         var marginLeft = parseInt(marker.css('margin-left'), 10);
-        var borderTopWidth = parseInt(marker.css('border-top-width'), 10);
         var marginTop = parseInt(marker.css('margin-top'), 10);
-        
         marker.css({
-            "top"    : (y - borderTopWidth - marginTop) + "px",
-            "left"   : (x - borderLeftWidth - marginLeft) + "px",
+            "top"    : (targetCell.position().top - marginTop) + "px",
+            "left"   : (targetCell.position().left - marginLeft) + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
             
         marker.show();
-        							        
-        // Select the cell!
-        //cell = getCellIndex({x: x, y: y});
-        //$('#' + "gem_" + cell.row +"_" + cell.col).addClass("selected");
     };
     
     // #mark Game Board setup
@@ -91,48 +72,53 @@ $(document).ready(function main() {
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
 
-    // Figure out where the game field has been positioned on the screen.
+    var cellMargin = parseInt(marker.css('margin-left'), 10);
+
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-    var cellSize = Math.floor((gameRect.width) / cols); 
-    var gemSize = cellSize - (parseInt(marker.css('margin-left'), 10) * 2);
-    
-    // Try to accomodate short phones by reducing the number of rows
-    var gameOffset = gameGrid.offset();
-    var winHeight = $(window).height();
-    while (winHeight < (cellSize * rows) + gameOffset.top) {
-        rows--;
+    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols); 
+    if (cellSize == 0) { // gameGrid.height() often fails in app-mode
+        cellSize = Math.floor(gameGrid.width() / cols); 
     }
-    
-    $(window).resize(function handleWindowResize() {
-        console.log('Resizing...');
-        //var isMobile = (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
-        var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
-        var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
+
+    // Reset game grid's height and width to what we really want.
+    // Include the margin given to each cell
+    //gameGrid.height((cellSize * rows) + cellMargin);
+    //gameGrid.width((cellSize * cols) + cellMargin);
+
+    var gemSize = cellSize - (cellMargin * 2);
+
+    $(window).resize(function handleWindowResize() {        
+        console.log('handleWindowResize()');
         
-        if (isMobile) {
-            if (isLandscape) {
-                $('#landscape-error').show();
-                gameGrid.hide();
-            } else {
-                $('#landscape-error').hide();
-                gameGrid.show();
-            }
-            return;
+        var gameWidth = gameGrid.width() - cellMargin;
+        var gameHeight = gameGrid.height() - cellMargin;
+        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols); 
+        if (cellSize == 0) { // gameGrid.height() often fails in app-mode
+            cellSize = Math.floor(gameWidth / cols); 
         }
 
-        // Figure out where the game field has been positioned on the screen.
-        // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-        gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-        cellSize = Math.floor((gameRect.width) / cols);
-        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
+        // Reset game grid's height and width to what we really want.
+        // Include the margin given to each cell
+        //gameGrid.css({'height':'', 'width':''});
+        //gameGrid.height((cellSize * rows) + cellMargin);
+        //gameGrid.width((cellSize * cols) + cellMargin);
+
+        gemSize = cellSize - (cellMargin * 2);
 
         // Reposition all gems to their new locations
+        var selectedCell = 0;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
                 repositionGem($("#gem_" + i +"_" + j), i, j);
             }
         }
+        
+        // TODO: Reposition marker as well.
+        if (!marker.is(':hidden')) {
+            marker.hide();
+            marker.showAtCell($("#gem_" + selectedRow +"_" + selectedCol))
+        }
+        
     });
     
     // #mark Sound system initialization
@@ -195,8 +181,8 @@ $(document).ready(function main() {
 
     function repositionGem(gem, row, col) {
         gem.css({
-            "top"    : (row * cellSize) + gameRect.top + "px",
-            "left"   : (col * cellSize) + gameRect.left + "px",
+            "top"    : (row * cellSize) + "px",
+            "left"   : (col * cellSize) + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
@@ -212,58 +198,33 @@ $(document).ready(function main() {
         gem.swipe(swipeHandlers);        
         repositionGem(gem, row, col);
     }
-    
-    function getPosition(element) {
-        var xPosition = 0;
-        var yPosition = 0;
 
-        while (element) {
-            xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-            element = element.offsetParent;
-			//console.log('position(' + xPosition + ', ' + yPosition + ')');
-        }
-
-        return { x: xPosition, y: yPosition };
-    }
-
-    function getCellIndex(position) {
-		cellRow = Math.floor((position.y - gameRect.top) / cellSize);
-		cellColumn = Math.floor((position.x - gameRect.left) / cellSize);
-
-		//console.log('position(' + position.x + ', ' + position.y + ') --> ' +
-		//            'cell(' + cellColumn + ', ' + cellRow + ')')
-
-        return { col: cellColumn, row: cellRow };
-    }
-
-    function handleTap(event, target) {
-        //console.log('handleTap(' + event + ', ' + target.id + ')');
+    function handleTap(target) {
+        console.log('handleTap(' + target + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
-		if ('#'+target.id == marker.selector) {
+		if (target.is(marker)) {
             marker.hide();			
 			selectedRow = selectedCol = empty;
 			return;
 		}
 
- 		if (gameState == "pick") {
- 		    var position = getPosition(target);
-			var selectedCell = getCellIndex(position);
-
-            //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
-
-            // TODO: Animate the selected cell?
-            marker.showAtPosition(position.x, position.y);
-
+ 		if (gameState == "pick") { 		
+ 		    // Row and column are encoded in cell's id
+ 		    var targetId = target.attr('id').split('_');
+            var targetRow = parseInt(targetId[1], 10);
+            var targetCol = parseInt(targetId[2], 10);
+ 		    
+            marker.showAtCell(target);
+            
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
 
-				selectedRow = selectedCell.row;
-				selectedCol = selectedCell.col;
+				selectedRow = targetRow;
+				selectedCol = targetCol;
 			} else {			                // Second cell selection
-			    posY = selectedCell.row;
-			    posX = selectedCell.col;
+			    posY = targetRow;
+			    posX = targetCol;
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
@@ -279,20 +240,19 @@ $(document).ready(function main() {
 		}
     }
 
-    function handleSwipe(event, target, direction) {
-        //console.log('handleSwipe(' + event + ', ' + target + ', ' + direction + ')');
+    function handleSwipe(target, direction) {
+        console.log('handleSwipe(' + target + ', ' + direction + ')');
 
 		if (gameState == "pick") {
-		    var position = getPosition(target);
-			posY = position.y;
-			posX = position.x;
-
-            marker.showAtPosition(position.x, position.y);
-
+ 		    // Row and column are encoded in cell's id
+ 		    var targetId = target.attr('id').split('_');
+            posY = selectedRow = parseInt(targetId[1], 10);
+   			posX = selectedCol = parseInt(targetId[2], 10);
+ 		    
+            // TODO: Animate the selected cell?
+            marker.showAtCell(target);
 			selectSound.play();
-			posY = selectedRow = Math.floor( (posY - gameRect.top) / cellSize);
-			posX = selectedCol = Math.floor( (posX - gameRect.left) / cellSize);
-
+			
             var trySwitch = false;
             switch (direction) {
                 case "up":

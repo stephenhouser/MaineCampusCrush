@@ -25,7 +25,7 @@
 	ga('create', 'UA-2571363-8', 'auto');
 	ga('set', {
   		'appName': 'Maine Campus Crush',
-        'appVersion': '0.6b',
+        'appVersion': '0.7b',
 	});
 	ga('send', 'pageview');
 </script>
@@ -49,6 +49,16 @@
 
 </head>
 <body>
+	<div id="header">
+		<div class="left"><a href="#" type="button" onClick="showAbout();">About</a></div>
+		<div class="center"><a href="#" id="score" onClick="showLeaderboard();">0</a></div>
+		<div class="right"><a href="#" type="button" onClick="location.reload();">Replay</a></div>
+	</div>
+
+	<div id="gamefield">
+    	<div id="marker" class="gem"></div>
+	</div>
+
 	<div id="playfor" title="Choose your team">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 		<ul>
@@ -109,18 +119,6 @@
     </div>
 
 	<div id="splash"><img src="splash.png"/>
-	</div>
-
-	<div id="header">
-		<div class="left"><a href="#" type="button" onClick="showAbout();">About</a></div>
-		<div class="center"><a href="#" id="score" onClick="showLeaderboard();">0</a></div>
-		<div class="right"><a href="#" type="button" onClick="location.reload();">Replay</a></div>
-	</div>
-
-    <h2 id="landscape-error">Landscape mode not supported on mobile devices</h2>
-	<div id="gamefield">
-	</div>
-
-	<div id="marker" class="gem"></div>
+	</div>	
 </body>
 </html>
