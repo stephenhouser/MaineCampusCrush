@@ -71,51 +71,42 @@ $(document).ready(function main() {
     // Initialize the game grid -- where the player plays...
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
-    var gamePosition = gameGrid.offset();
-    var gp = gameGrid.position();
+
+    var cellMargin = parseInt(marker.css('margin-left'), 10);
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var cellSize = Math.floor((Math.min(gameGrid.width(), gameGrid.height())) / cols); 
+    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols); 
     if (cellSize == 0) { // gameGrid.height() often fails in app-mode
         cellSize = Math.floor(gameGrid.width() / cols); 
     }
-    var gemSize = cellSize - (parseInt(marker.css('margin-left'), 10) * 2);
 
-    //alert("initialize: game= (" + gameRect.top + ", " + gameRect.left + "), "
-    //            + "(" + gameRect.height + ", " + gameRect.width + ") "
-    //            + "cellSize = " + cellSize + ", gemSize = " + gemSize);
+    // Reset game grid's height and width to what we really want.
+    // Include the margin given to each cell
+    //gameGrid.height((cellSize * rows) + cellMargin);
+    //gameGrid.width((cellSize * cols) + cellMargin);
+
+    var gemSize = cellSize - (cellMargin * 2);
+
+    $(window).resize(function handleWindowResize() {        
+        console.log('handleWindowResize()');
         
-    $(window).resize(function handleWindowResize() {
-        //var isMobile = (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
-        var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
-        var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
-        
-        /*
-        if (isMobile) {
-            //if (isLandscape) {
-            //    $('#landscape-error').show();
-            //    gameGrid.hide();
-            //} else {
-            //    $('#landscape-error').hide();
-            //    gameGrid.show();
-            //}
-            return;
-        }
-        */
-        
-        // Compute size of game grid (cellSize) and the gems inside them (gemSize)        
-        gamePosition = gameGrid.offset();
-        cellSize = Math.floor((Math.min(gameGrid.width(), gameGrid.height())) / cols); 
+        var gameWidth = gameGrid.width() - cellMargin;
+        var gameHeight = gameGrid.height() - cellMargin;
+        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols); 
         if (cellSize == 0) { // gameGrid.height() often fails in app-mode
-            cellSize = Math.floor(gameGrid.width() / cols); 
+            cellSize = Math.floor(gameWidth / cols); 
         }
-        gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
 
-        //alert("resize: game= (" + gameRect.top + ", " + gameRect.left + "), "
-        //    + "(" + gameRect.height + ", " + gameRect.width + ") "
-        //    + "cellSize = " + cellSize + ", gemSize = " + gemSize);
+        // Reset game grid's height and width to what we really want.
+        // Include the margin given to each cell
+        //gameGrid.css({'height':'', 'width':''});
+        //gameGrid.height((cellSize * rows) + cellMargin);
+        //gameGrid.width((cellSize * cols) + cellMargin);
+
+        gemSize = cellSize - (cellMargin * 2);
 
         // Reposition all gems to their new locations
+        var selectedCell = 0;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
                 repositionGem($("#gem_" + i +"_" + j), i, j);
@@ -123,6 +114,10 @@ $(document).ready(function main() {
         }
         
         // TODO: Reposition marker as well.
+        if (!marker.is(':hidden')) {
+            marker.hide();
+            marker.showAtCell($("#gem_" + selectedRow +"_" + selectedCol))
+        }
         
     });
     
