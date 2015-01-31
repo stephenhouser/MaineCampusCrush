@@ -49,17 +49,17 @@
 
 </head>
 <body>
-	<div id="playfor" title="Play for the">
+	<div id="playfor" title="Choose your team">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 		<ul>
-			<li class="jeweltype0"><a href="#" onClick="hidePlayFor();"><img src="umaine.png" /><br/>Black Bears</a></li>
-			<li class="jeweltype1"><a href="#" onClick="hidePlayFor();"><img src="usm.png" /><br/>Huskies</a></li>
-			<li class="jeweltype2"><a href="#" onClick="hidePlayFor();"><img src="uma.png" /><br/>Moose</a></li>
-			<li class="jeweltype4"><a href="#" onClick="hidePlayFor();"><img src="umpi.png" /><br/>Owls</a></li>
-			<li class="jeweltype3"><a href="#" onClick="hidePlayFor();"><img src="umf.png" /><br/>Beavers</a></li>
-			<li class="jeweltype5"><a href="#" onClick="hidePlayFor();"><img src="umm.png" /><br/>Clippers</a></li>
-			<li class="jeweltype6"><a href="#" onClick="hidePlayFor();"><img src="umfk.png" /><br/>Bengals</a></li>
-			<li class="jeweltype7"><a href="#" onClick="hidePlayFor();"><img src="ums.png" /><br/>System</a></li>
+			<li class="jeweltype0" onClick="hidePlayFor();"><img src="umaine.png" /><br/>Black Bears</li>
+			<li class="jeweltype1" onClick="hidePlayFor();"><img src="usm.png" /><br/>Huskies</li>
+			<li class="jeweltype2" onClick="hidePlayFor();"><img src="uma.png" /><br/>Moose</li>
+			<li class="jeweltype4" onClick="hidePlayFor();"><img src="umpi.png" /><br/>Owls</li>
+			<li class="jeweltype3" onClick="hidePlayFor();"><img src="umf.png" /><br/>Beavers</li>
+			<li class="jeweltype5" onClick="hidePlayFor();"><img src="umm.png" /><br/>Clippers</li>
+			<li class="jeweltype6" onClick="hidePlayFor();"><img src="umfk.png" /><br/>Bengals</li>
+			<li class="jeweltype7" onClick="hidePlayFor();"><img src="ums.png" /><br/>System</li>
 		</ul>
 	</div>
 
@@ -89,22 +89,22 @@
 		<p>Developed by:<br/><i><a href="http://about.me/stephenhouser">Stephen Houser</a></i></p>
 	</div>
 
-	<div id="highscore" title="Leaderboard">
+	<div id="leaderboard" title="Leaderboard">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 
-        <ul>
-		    <li class="myhiscore"><p>Your High Score</p> <span class="hiscore">1920</span></li>
+        <ul id="myscores">
+		    <li><p>Your High Score</p> <span class="score">0</span></li>
 		</ul>
 		<hr/>
-		<ul>
-			<li class="jeweltype1"><p>Huskies</p> <span class="hiscore">1920</span></li>
-			<li class="jeweltype0"><p>Black Bears</p> <span class="hiscore">91800</span></li>
-			<li class="jeweltype2"><p>Moose</p> <span class="hiscore">760</span></li>
-			<li class="jeweltype4"><p>Owls</p> <span class="hiscore">840</span></li>
-			<li class="jeweltype3"><p>Beavers</p> <span class="hiscore">830</span></li>
-			<li class="jeweltype5"><p>Clippers</p> <span class="hiscore">760</span></li>
-			<li class="jeweltype6"><p>Bengals</p> <span class="hiscore">410</span></li>
-			<li class="jeweltype7"><p>System</p> <span class="hiscore">1</span></li>
+		<ul id="teamscores">
+			<li class="jeweltype1"><p>Huskies</p> <span class="score">0</span></li>
+			<li class="jeweltype0"><p>Black Bears</p> <span class="score">0</span></li>
+			<li class="jeweltype2"><p>Moose</p> <span class="score">0</span></li>
+			<li class="jeweltype4"><p>Owls</p> <span class="score">0</span></li>
+			<li class="jeweltype3"><p>Beavers</p> <span class="score">0</span></li>
+			<li class="jeweltype5"><p>Clippers</p> <span class="score">0</span></li>
+			<li class="jeweltype6"><p>Bengals</p> <span class="score">0</span></li>
+			<li class="jeweltype7"><p>System</p> <span class="score">0</span></li>
 		</ul>
     </div>
 
@@ -113,7 +113,7 @@
 
 	<div id="header">
 		<div class="left"><a href="#" type="button" onClick="showAbout();">About</a></div>
-		<div class="center"><a href="#" id="score" onClick="showHighScore();">0</a></div>
+		<div class="center"><a href="#" id="score" onClick="showLeaderboard();">0</a></div>
 		<div class="right"><a href="#" type="button" onClick="location.reload();">Replay</a></div>
 	</div>
 

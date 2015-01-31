@@ -11,6 +11,7 @@ html, body {
 
 a {
 	color: white;
+	outline: none;
 }
 
 #splash {
@@ -42,11 +43,6 @@ a {
 }
 
 #header .center a {
-    /*
-    display: inline-block;
-    border: 1px solid grey;
-    min-width: 25%;
-    */
     text-decoration: none;
 }
 
@@ -150,7 +146,7 @@ a {
 }
 
 
-#about, #playfor, #highscore {
+#about, #playfor, #leaderboard {
 	display: none;
 }
 
@@ -177,6 +173,7 @@ a {
 	border: 2px solid grey;
 	border-radius: 5px;
 	width: 45%;
+	max-width: 150px;
 	vertical-align: top;
 }
 
@@ -184,54 +181,66 @@ a {
 	display: block
 }
 
-#highscore {
+#leaderboard {
     padding: 0px;
 }
 
-#highscore ul {
-    margin-left: auto;
-    margin-right: auto;
+#leaderboard ul {
     width: 100%;
     padding: 0px;
 }
 
-#highscore ul li {
+#leaderboard ul li {
     background-repeat: no-repeat;
-    border: 2px solid white;
     border-radius: 5px;
-    margin: 2px;
-    list-style-type: none;
     height: 44px;
     background-size: 44px;
+    margin-bottom: 3px;
 }
 
-#highscore ul li.myhiscore {
-    list-style-type: none;
-    height: 30px;
-}
-#highscore ul li.myhiscore p {
-    margin-left: 10px;
-    font-size: medium;
-}
-
-
-#highscore ul li p {
-    font-weight: bold;
-    font-size: x-large;
-    
+#leaderboard ul li p {
     display: inline-block;
     vertical-align: middle;
-    margin-left: 48px;
 }
 
-#highscore ul li .hiscore {
+ul#myscores li {
+    height: 32px;
+}
+
+ul#myscores li p {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+ul#teamscores li p {
+    margin-left: 48px;
+    font-weight: bold;
+    font-size: x-large;    
+}
+
+ul#myscores li .score,
+ul#teamscores li .score {
     float: right;
     display: inline-block;
     margin: 5px;
     font-weight: normal;     
 }
 
+/* jQuery UI settings */
+.ui-dialog .ui-dialog-title {
+    text-align: center;
+}
 
+/* Center jQuery buttons on dialogs */
+.ui-dialog .ui-dialog-buttonpane {
+    margin: 0px;
+    padding: 0px; 
+    text-align: center;
+}
+
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
+    float: none;
+}
 
 /* iPhone 4 and 4s ----------- */
 @media only screen

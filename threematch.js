@@ -16,11 +16,14 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
+var jewelScore   = 10;
+var jewelTypes   = 8;    // Number of different types of "jewels"
+var currentScore = 0;
+
 $(document).ready(function main() {
     // These are the major configuration options
 	var cols        = 6;    // Number of columns
 	var rows        = 8;    // Number of rows
-  	var jewelTypes  = 8;    // Number of different types of "jewels"
 
     // Constant to represent an empty cell or invalid selection
     var empty = -1;
@@ -147,6 +150,9 @@ $(document).ready(function main() {
 
     // #mark Document Functions
     function resetGame() {
+        currentScore = 0;
+        saveScore(currentScore);
+        
         // Initialize all cells to -1 (empty)
         // TODO: Do we need to pre-initialize all the cells this way?
         for (i = 0; i < rows; i++) {
@@ -450,8 +456,10 @@ $(document).ready(function main() {
 						checkMoving();
 
 						// Update score
-						var score = parseInt($("#score").text(), 10);
-						$("#score").text(score+10);
+						//var score = parseInt($("#score").text(), 10) + 10;
+						currentScore += jewelScore;
+						$("#score").text(currentScore);
+						saveScore(currentScore);
 					}
 			});
 		});
@@ -605,12 +613,15 @@ $(document).ready(function main() {
 
 function showAbout() {
 	$("#about").dialog({
+        position: { my: "top", at: "top+2%" },
+        maxWidth: 480,
 	    width: "90%",
 	    modal: true,
 	    buttons: {
             Ok: function() {
                 $('#about').dialog('close');
-            }
+    	        window.scrollTo(0, 0);
+    	    }
         },
         close: function onCloseAbout() {
             console.log('hideAbout');
@@ -626,7 +637,8 @@ function hidePlayFor() {
 
 function showPlayFor() {
 	$("#playfor").dialog({
-		dialogClass: 'no-close',
+		//dialogClass: 'no-close',
+        position: { my: "top", at: "top+2%" },
 		draggable: false,
 		modal: true,
         close: function onClosePlayFor() {
@@ -636,20 +648,64 @@ function showPlayFor() {
 	});
 }
 
-function showHighScore() {
-	$("#highscore").dialog({
-	    /*
-	    modal: true,
-	    buttons: {
-            Ok: function() {
-                $("#highscore").dialog('close');
+function showLeaderboard() {
+    // Pull my high score
+    var highScore = localStorage.highScore;
+    if (highScore) {
+        $('#myscores  .score').text(highScore);
+    }
+		    
+    // Pull high scores from "server"
+    $.ajax({
+        url: 'hiscore.json',
+        datatype: 'jsonp',
+        success: function(data) {
+            for (var team = 0; team < jewelTypes; team++) {
+                var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
+                
+                //console.log(spanSelector + ': ' + team + ': ' 
+                //    +  scoreSpan.text() + ' to ' + data[team]);
+
+                scoreSpan.text(data[team]);
             }
+            /* -- to sort the leaderboard
+            var ul = $('ul#ulName'),
+            li = ul.children('li');
+    
+            li.detach().sort(function(a,b) {
+                return $(a).data('sortby') - $(b).data('sortby');  
+            });
+    
+            ul.append(li);
+            });
+            */
+            
         },
-        */
+        error: function() {
+        }
+    });
+
+	$("#leaderboard").dialog({
+        position: { my: "top", at: "top+2%" },
         close: function onCloseHighScore() {
             // ensure we are at the top of the window or things get screwy
-    	    window.scrollTo(0, 0);
-        }
+            window.scrollTo(0, 0);
+        },
+        buttons: [{
+            text: "Change Team",
+            click: function() {
+                $(this).dialog( "close" );
+                showPlayFor();
+            }
+        }]
     });
 }
 
+function saveScore(score) {
+    localStorage.lastScore = score;
+
+    var highScore = localStorage.highScore;
+    if (!highScore || score > highScore) {
+        localStorage.highScore = score;
+    }
+}
