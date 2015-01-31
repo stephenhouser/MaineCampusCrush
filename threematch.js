@@ -53,10 +53,12 @@ $(document).ready(function main() {
     // Swipe and tap handler callbacks for interaction
     var swipeHandlers = {
         swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-            handleSwipe(event, event.changedTouches[0].target, direction);
+            var target = event.changedTouches[0];
+            handleSwipe(event, $(target), direction);
         },
         tap:function(event, target) {
-            handleTap(event, target);
+            console.log('tapHandler ' + event + target);
+            handleTap(event, $(target));
         }
     }
 
@@ -65,25 +67,18 @@ $(document).ready(function main() {
     var marker = $('#marker');
     marker.hide(); // should be display: none in CSS already. Be safe.
     marker.swipe(swipeHandlers);
-    marker.showAtPosition = function(x, y) {
+    marker.showAtCell = function(targetCell) {
         // Position the "marker" to show which cell we have selected.
-        var borderLeftWidth = parseInt(marker.css('border-left-width'), 10);
         var marginLeft = parseInt(marker.css('margin-left'), 10);
-        var borderTopWidth = parseInt(marker.css('border-top-width'), 10);
         var marginTop = parseInt(marker.css('margin-top'), 10);
-        
         marker.css({
-            "top"    : (y - borderTopWidth - marginTop) + "px",
-            "left"   : (x - borderLeftWidth - marginLeft) + "px",
+            "top"    : (targetCell.position().top - marginTop) + "px",
+            "left"   : (targetCell.position().left - marginLeft) + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
             
         marker.show();
-        							        
-        // Select the cell!
-        //cell = getCellIndex({x: x, y: y});
-        //$('#' + "gem_" + cell.row +"_" + cell.col).addClass("selected");
     };
     
     // #mark Game Board setup
@@ -213,11 +208,12 @@ $(document).ready(function main() {
         repositionGem(gem, row, col);
     }
     
-    function getPosition(element) {
+    function getPosition(target) {
+        var element = target[0];
         var xPosition = 0;
         var yPosition = 0;
 
-        while (element) {
+        while (element) { 
             xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
             yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
             element = element.offsetParent;
@@ -238,32 +234,34 @@ $(document).ready(function main() {
     }
 
     function handleTap(event, target) {
-        //console.log('handleTap(' + event + ', ' + target.id + ')');
+        console.log('handleTap(' + event + ', ' + target + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
-		if ('#'+target.id == marker.selector) {
+		if (target.is(marker)) {
             marker.hide();			
 			selectedRow = selectedCol = empty;
 			return;
 		}
 
- 		if (gameState == "pick") {
- 		    var position = getPosition(target);
-			var selectedCell = getCellIndex(position);
-
-            //console.log('selectedCell (' + selectedCell.col + ', ' + selectedCell.row + ')');
+ 		if (gameState == "pick") { 		
+ 		    // Row and column are encoded in cell's id
+ 		    var targetId = target.attr('id').split('_');
+            var targetRow = parseInt(targetId[1], 10);
+            var targetCol = parseInt(targetId[2], 10);
+ 		    
+            console.log('handleTap (' + targetCol + ', ' + targetRow + ')');
 
             // TODO: Animate the selected cell?
-            marker.showAtPosition(position.x, position.y);
+            marker.showAtCell(target);
 
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
 
-				selectedRow = selectedCell.row;
-				selectedCol = selectedCell.col;
+				selectedRow = targetRow;
+				selectedCol = targetCol;
 			} else {			                // Second cell selection
-			    posY = selectedCell.row;
-			    posX = selectedCell.col;
+			    posY = targetRow;
+			    posX = targetCol;
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
