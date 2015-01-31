@@ -79,7 +79,12 @@ $(document).ready(function main() {
     // Figure out where the game field has been positioned on the screen.
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
     var gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-    var cellSize = Math.floor((gameRect.width) / cols); 
+    
+    var cellSize = Math.floor((Math.min(gameRect.width, gameRect.height)) / cols); 
+    if (cellSize == 0) { // gameRect.height is sometimes 0
+        cellSize = Math.floor((gameRect.width) / cols);
+    }
+
     var gemSize = cellSize - (parseInt(marker.css('margin-left'), 10) * 2);
     
     // Try to accomodate short phones by reducing the number of rows
@@ -92,8 +97,6 @@ $(document).ready(function main() {
     */
     
     $(window).resize(function handleWindowResize() {
-        console.log('Resizing...');
-        
         //var isMobile = (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
         var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
         var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
@@ -112,8 +115,14 @@ $(document).ready(function main() {
         // Figure out where the game field has been positioned on the screen.
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)
         gameRect = document.getElementById(gameGridId).getBoundingClientRect();
-        cellSize = Math.floor((gameRect.width) / cols);
+        cellSize = Math.floor((Math.min(gameRect.width, gameRect.height)) / cols); 
+        if (cellSize == 0) { // gameRect.height is sometimes 0
+            cellSize = Math.floor((gameRect.width) / cols);
+        }
+        
         gemSize = cellSize - (parseInt(marker.css('margin'), 10) * 2);
+        
+        console.log("Resize: cell="+cellSize + ", gem=" + gemSize);
 
         // Reposition all gems to their new locations
         for (i = 0; i < rows; i++) {
