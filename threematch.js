@@ -619,12 +619,18 @@ function showAbout() {
 	    modal: true,
 	    buttons: {
             Ok: function() {
-                $('#about').dialog('close');
     	        window.scrollTo(0, 0);
+                $('#about').dialog('close');
     	    }
         },
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+    	        window.scrollTo(0, 0);
+                $('#about').dialog('close');
+            });
+        },
         close: function onCloseAbout() {
-            console.log('hideAbout');
+            console.log('close about');
             // ensure we are at the top of the window or things get screwy
     	    window.scrollTo(0, 0);
         }
@@ -641,6 +647,11 @@ function showPlayFor() {
         position: { my: "top", at: "top+2%" },
 		draggable: false,
 		modal: true,
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+                $('#playfor').dialog('close');
+            })
+        },
         close: function onClosePlayFor() {
             // ensure we are at the top of the window or things get screwy
     	    window.scrollTo(0, 0);
@@ -690,6 +701,11 @@ function showLeaderboard() {
         close: function onCloseHighScore() {
             // ensure we are at the top of the window or things get screwy
             window.scrollTo(0, 0);
+        },
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+                $('#leaderboard').dialog('close');
+            })
         },
         buttons: [{
             text: "Change Team",
