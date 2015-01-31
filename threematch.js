@@ -642,6 +642,7 @@ function showLeaderboard() {
     // Pull high scores from "server"
     $.ajax({
         url: 'hiscore.json',
+        cache : false,
         datatype: 'jsonp',
         success: function(data) {
             for (var team = 0; team < jewelTypes; team++) {
@@ -652,18 +653,18 @@ function showLeaderboard() {
 
                 scoreSpan.text(data[team]);
             }
-            /* -- to sort the leaderboard
-            var ul = $('ul#ulName'),
-            li = ul.children('li');
+            
+            /* -- to sort the leaderboard */
+            var ul = $('ul#teamscores'),
+                li = ul.children('li');
     
             li.detach().sort(function(a,b) {
-                return $(a).data('sortby') - $(b).data('sortby');  
+                var scoreA = parseInt($(a).children('.score').text());
+                var scoreB = parseInt($(b).children('.score').text());
+                return scoreB - scoreA;
             });
     
-            ul.append(li);
-            });
-            */
-            
+            ul.append(li);            
         },
         error: function() {
         }
