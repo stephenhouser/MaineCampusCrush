@@ -1,9 +1,5 @@
 /*
 
-TODO: Location of gamefield is absolute and very fragile
-	Would be nicer to be set my HTML/CSS rather than wiggling around
-	in JavaScript.
-
 */
 
 // These are the major configuration options
@@ -76,6 +72,7 @@ $(document).ready(function main() {
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
     var gamePosition = gameGrid.offset();
+    var gp = gameGrid.position();
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
     var cellSize = Math.floor((Math.min(gameGrid.width(), gameGrid.height())) / cols); 
@@ -93,6 +90,7 @@ $(document).ready(function main() {
         var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
         var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
         
+        /*
         if (isMobile) {
             //if (isLandscape) {
             //    $('#landscape-error').show();
@@ -103,6 +101,7 @@ $(document).ready(function main() {
             //}
             return;
         }
+        */
         
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)        
         gamePosition = gameGrid.offset();
@@ -187,8 +186,8 @@ $(document).ready(function main() {
 
     function repositionGem(gem, row, col) {
         gem.css({
-            "top"    : (row * cellSize) + gamePosition.top + "px",
-            "left"   : (col * cellSize) + gamePosition.left + "px",
+            "top"    : (row * cellSize) + "px",
+            "left"   : (col * cellSize) + "px",
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
@@ -204,33 +203,6 @@ $(document).ready(function main() {
         gem.swipe(swipeHandlers);        
         repositionGem(gem, row, col);
     }
-    
-    /*
-    function getPosition(target) {
-        var element = target[0];
-        var xPosition = 0;
-        var yPosition = 0;
-
-        while (element) { 
-            xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-            element = element.offsetParent;
-			//console.log('position(' + xPosition + ', ' + yPosition + ')');
-        }
-
-        return { x: xPosition, y: yPosition };
-    }
-
-    function getCellIndex(position) {
-		cellRow = Math.floor((position.y - gameRect.top) / cellSize);
-		cellColumn = Math.floor((position.x - gameRect.left) / cellSize);
-
-		//console.log('position(' + position.x + ', ' + position.y + ') --> ' +
-		//            'cell(' + cellColumn + ', ' + cellRow + ')')
-
-        return { col: cellColumn, row: cellRow };
-    }
-    */
 
     function handleTap(target) {
         console.log('handleTap(' + target + ')');
@@ -248,9 +220,8 @@ $(document).ready(function main() {
             var targetRow = parseInt(targetId[1], 10);
             var targetCol = parseInt(targetId[2], 10);
  		    
-            // TODO: Animate the selected cell?
             marker.showAtCell(target);
-
+            
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
 
