@@ -55,8 +55,17 @@ a {
 #gamefield {
     margin: auto;
     width: 45%;
-    height: 100%;
     min-width: 485px;
+    overflow: hidden;
+}
+
+#landscape-error {
+    height: 75%;
+    font-size: xx-large;
+    color: red;
+    display: none;
+    margin: 10%;
+    text-align: center;
 }
 
 .gem {
