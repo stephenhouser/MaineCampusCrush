@@ -16,11 +16,14 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
+var jewelScore   = 10;
+var jewelTypes   = 8;    // Number of different types of "jewels"
+var currentScore = 0;
+
 $(document).ready(function main() {
     // These are the major configuration options
 	var cols        = 6;    // Number of columns
 	var rows        = 8;    // Number of rows
-  	var jewelTypes  = 8;    // Number of different types of "jewels"
 
     // Constant to represent an empty cell or invalid selection
     var empty = -1;
@@ -100,10 +103,24 @@ $(document).ready(function main() {
     while (winHeight < (cellSize * rows) + gameOffset.top) {
         rows--;
     }
-
+    
     $(window).resize(function handleWindowResize() {
-        //console.log('Resizing...');
+        console.log('Resizing...');
+        //var isMobile = (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
+        var isMobile = (/iPhone|iPod|Android|BlackBerry/).test(navigator.userAgent);
+        var isLandscape = (window.matchMedia("(orientation: landscape)")).matches;
         
+        if (isMobile) {
+            if (isLandscape) {
+                $('#landscape-error').show();
+                gameGrid.hide();
+            } else {
+                $('#landscape-error').hide();
+                gameGrid.show();
+            }
+            return;
+        }
+
         // Figure out where the game field has been positioned on the screen.
         // Compute size of game grid (cellSize) and the gems inside them (gemSize)
         gameRect = document.getElementById(gameGridId).getBoundingClientRect();
@@ -117,7 +134,7 @@ $(document).ready(function main() {
             }
         }
     });
-
+    
     // #mark Sound system initialization
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
@@ -147,6 +164,9 @@ $(document).ready(function main() {
 
     // #mark Document Functions
     function resetGame() {
+        currentScore = 0;
+        saveScore(currentScore);
+        
         // Initialize all cells to -1 (empty)
         // TODO: Do we need to pre-initialize all the cells this way?
         for (i = 0; i < rows; i++) {
@@ -450,8 +470,10 @@ $(document).ready(function main() {
 						checkMoving();
 
 						// Update score
-						var score = parseInt($("#score").text(), 10);
-						$("#score").text(score+10);
+						//var score = parseInt($("#score").text(), 10) + 10;
+						currentScore += jewelScore;
+						$("#score").text(currentScore);
+						saveScore(currentScore);
 					}
 			});
 		});
@@ -603,12 +625,29 @@ $(document).ready(function main() {
 	}
 });
 
-function hideAbout() {
-	$("#about").dialog('close');
-}
-
 function showAbout() {
-	$("#about").dialog({ width: "90%", });
+	$("#about").dialog({
+        position: { my: "top", at: "top+2%" },
+        maxWidth: 480,
+	    width: "90%",
+	    modal: true,
+	    buttons: {
+            Ok: function() {
+    	        window.scrollTo(0, 0);
+                $('#about').dialog('close');
+    	    }
+        },
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+    	        window.scrollTo(0, 0);
+                $('#about').dialog('close');
+            });
+        },
+        close: function onCloseAbout() {
+            // ensure we are at the top of the window or things get screwy
+    	    window.scrollTo(0, 0);
+        }
+    });
 }
 
 function hidePlayFor() {
@@ -617,9 +656,85 @@ function hidePlayFor() {
 
 function showPlayFor() {
 	$("#playfor").dialog({
-		dialogClass: 'no-close',
+		//dialogClass: 'no-close',
+        position: { my: "top", at: "top+2%" },
 		draggable: false,
-		modal: true
+		modal: true,
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+                $('#playfor').dialog('close');
+            })
+        },
+        close: function onClosePlayFor() {
+            // ensure we are at the top of the window or things get screwy
+    	    window.scrollTo(0, 0);
+        }
 	});
 }
 
+function showLeaderboard() {
+    // Pull my high score
+    var highScore = localStorage.highScore;
+    if (highScore) {
+        $('#myscores  .score').text(highScore);
+    }
+		    
+    // Pull high scores from "server"
+    $.ajax({
+        url: 'hiscore.json',
+        datatype: 'jsonp',
+        success: function(data) {
+            for (var team = 0; team < jewelTypes; team++) {
+                var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
+                
+                //console.log(spanSelector + ': ' + team + ': ' 
+                //    +  scoreSpan.text() + ' to ' + data[team]);
+
+                scoreSpan.text(data[team]);
+            }
+            /* -- to sort the leaderboard
+            var ul = $('ul#ulName'),
+            li = ul.children('li');
+    
+            li.detach().sort(function(a,b) {
+                return $(a).data('sortby') - $(b).data('sortby');  
+            });
+    
+            ul.append(li);
+            });
+            */
+            
+        },
+        error: function() {
+        }
+    });
+
+	$("#leaderboard").dialog({
+        position: { my: "top", at: "top+2%" },
+        close: function onCloseHighScore() {
+            // ensure we are at the top of the window or things get screwy
+            window.scrollTo(0, 0);
+        },
+        create: function onCreateAbout() {
+            $(".ui-dialog-titlebar").click(function (){
+                $('#leaderboard').dialog('close');
+            })
+        },
+        buttons: [{
+            text: "Change Team",
+            click: function() {
+                $(this).dialog( "close" );
+                showPlayFor();
+            }
+        }]
+    });
+}
+
+function saveScore(score) {
+    localStorage.lastScore = score;
+
+    var highScore = localStorage.highScore;
+    if (!highScore || score > highScore) {
+        localStorage.highScore = score;
+    }
+}
