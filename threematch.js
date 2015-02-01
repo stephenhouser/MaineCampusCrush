@@ -565,18 +565,18 @@ $(document).ready(function main() {
         ];                
                 
         //console.log(gameString);
-        validMoves = 0;
+        validMoveCount = 0;
         regExes.forEach(function(pattern) {
             var match = pattern.exec(gameString);
             while (match != null) {
                 //console.log('at ' + match.index + ' found pattern "' + pattern + '" ==> ' + match);
-                validMoves++;
+                validMoveCount++;
                 match = pattern.exec(gameString);
             }
         });
 
-        console.log('Valid Moves: ' + validMoves);        
-        return validMoves;
+        console.log('Valid Moves: ' + validMoveCount);        
+        return validMoveCount;
     }
 
 	function isVerticalStreak(row, col) {
@@ -623,7 +623,14 @@ $(document).ready(function main() {
 });
 
 function gameOver() {
-	$("#gameover").dialog({
+    var gameOverDialog = $('#gameover');
+    var lastScore = gameOverDialog.find('#lastscore');
+    var highScore = gameOverDialog.find('#highscore');
+    
+    lastScore.text(localStorage.lastScore);
+    highScore.text(localStorage.highScore);   
+
+    gameOverDialog.dialog({
 	    dialogClass: 'no-close',
         closeOnEscape: false,
         modal: true,
@@ -633,6 +640,12 @@ function gameOver() {
                 $(this).dialog("close");
                 restartGame();
             }
+            }, {
+            text: "Leaderboard",
+            click: function() {
+                $(this).dialog("close");
+                showLeaderboard();
+            }            
         }]
     });
 }
