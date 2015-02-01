@@ -76,7 +76,7 @@ $(document).ready(function main() {
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
     var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols); 
-    if (cellSize == 0) { // gameGrid.height() often fails in app-mode
+    if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
         cellSize = Math.floor(gameGrid.width() / cols); 
     }
 
@@ -93,7 +93,7 @@ $(document).ready(function main() {
         var gameWidth = gameGrid.width() - cellMargin;
         var gameHeight = gameGrid.height() - cellMargin;
         cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols); 
-        if (cellSize == 0) { // gameGrid.height() often fails in app-mode
+        if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
             cellSize = Math.floor(gameWidth / cols); 
         }
 
