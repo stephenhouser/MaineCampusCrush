@@ -697,6 +697,8 @@ function showPlayFor() {
 	});
 }
 
+var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
+
 function showLeaderboard() {
     // Pull my high score
     var highScore = localStorage.highScore;
@@ -710,13 +712,15 @@ function showLeaderboard() {
         cache : false,
         datatype: 'jsonp',
         success: function(data) {
+            var leaderboard = data["leaderboard"];
             for (var team = 0; team < jewelTypes; team++) {
+                var teamData = leaderboard[team];
                 var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
                 
-                //console.log(spanSelector + ': ' + team + ': ' 
-                //    +  scoreSpan.text() + ' to ' + data[team]);
+                console.log(team + ': ' 
+                    +  scoreSpan.text() + ' to ' + teamData["score"]);
 
-                scoreSpan.text(data[team]);
+                scoreSpan.text(teamData["score"]);
             }
             
             /* -- to sort the leaderboard */
@@ -731,7 +735,8 @@ function showLeaderboard() {
     
             ul.append(li);            
         },
-        error: function() {
+        error: function(e) {
+            console.log(e);
         }
     });
 
