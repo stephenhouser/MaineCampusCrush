@@ -530,14 +530,17 @@ $(document).ready(function main() {
     }
 
     function checkGameOver() {
-        if (!validMoveExists()) {
+        var moves = validMoves();
+        $('#moves').text('' + moves + ' valid moves');
+        
+        if (!moves) {
             console.log('GAME OVER!');
-            $('#gameover').show();
+            gameOver();
         }
     }
 
     // #mark Game Over (work in progress)
-    function validMoveExists() {
+    function validMoves() {
         // Such an elegant and fast solution using regular expressions.
         // http://codegolf.stackexchange.com/questions/26505/determine-if-a-move-exists-in-a-bejeweled-match-3-game/26512#26512
         
@@ -618,6 +621,21 @@ $(document).ready(function main() {
 	 	return isVerticalStreak(row, col) || isHorizontalStreak(row, col);
 	}
 });
+
+function gameOver() {
+	$("#gameover").dialog({
+	    dialogClass: 'no-close',
+        closeOnEscape: false,
+        modal: true,
+        buttons: [{
+            text: "Try Again",
+            click: function() {
+                $(this).dialog("close");
+                restartGame();
+            }
+        }]
+    });
+}
 
 function showAbout() {
 	$("#about").dialog({

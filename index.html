@@ -57,9 +57,18 @@
 
 	<div id="gamefield">
     	<div id="marker" class="gem"></div>
-    	<div id="gameover"><p>Game Over!</p><button type="button" onClick="restartGame();">Try Again</button></div>
+	</div>
+	
+	<div id="footer">
+	    <div class="center"><span id="moves">0</span></div>
 	</div>
 
+	<div id="gameover" title="Game Over">
+		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
+		<p>Score: <span class="score">0</span></p>
+		<p>High score: <span class="score">0</span></p>
+	</div>
+	
 	<div id="playfor" title="Choose your team">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 		<ul>
