@@ -312,7 +312,7 @@ ul#teamscores li .score {
     and (max-device-width : 1024px) 
     and (orientation : landscape) {
     #gamefield {
-        width: 45%;
+        width: 43%;
     }
 }
 
