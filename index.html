@@ -52,11 +52,12 @@
 	<div id="header">
 		<div class="left"><a href="#" type="button" onClick="showAbout();">About</a></div>
 		<div class="center"><a href="#" id="score" onClick="showLeaderboard();">0</a></div>
-		<div class="right"><a href="#" type="button" onClick="location.reload();">Replay</a></div>
+		<div class="right"><a href="#" type="button" onClick="restartGame();">Replay</a></div>
 	</div>
 
 	<div id="gamefield">
     	<div id="marker" class="gem"></div>
+    	<div id="gameover"><p>Game Over!</p><button type="button" onClick="restartGame();">Try Again</button></div>
 	</div>
 
 	<div id="playfor" title="Choose your team">

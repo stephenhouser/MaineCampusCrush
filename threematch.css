@@ -84,7 +84,7 @@ a {
     border-color: black;
 }
 
-@-webkit-keyframes markeranimation {
+@-webkit-keyframes marker {
     from {
         -webkit-transform: scale(0.95, 0.95);
     }
@@ -94,7 +94,7 @@ a {
     }
 }
 
-@-moz-keyframes markeranimation {
+@-moz-keyframes marker {
     from {
         -moz-transform: scale(0.95, 0.95);
     }
@@ -109,8 +109,59 @@ a {
     border: 7px solid white;
     z-index: 1;
 
-    -webkit-animation: markeranimation 250ms infinite alternate;
-    -moz-animation: markeranimation 250ms infinite alternate;    
+    -webkit-animation: marker 250ms infinite alternate;
+    -moz-animation: markern 250ms infinite alternate;    
+}
+
+@-webkit-keyframes gameover {
+    from {
+        -webkit-transform: scale(0, 0);
+        opacity: 0;
+    }
+
+    to {
+        -webkit-transform: scale(1, 1);
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes gameover {
+    from {
+        -moz-transform: scale(0, 0);
+        opacity: 0;
+    }
+
+    to {
+        -moz-transform: scale(1, 1);
+        opacity: 1;
+    }
+}
+
+#gameover {
+    display: none;
+    position: relative;
+
+    top: 33%;
+    width: 66%;
+    
+    padding: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    
+    border-radius: 15px;
+    border: 5px solid red;
+    
+    font-size: xx-large;
+    
+    color: red;
+    background-color: white;
+    text-align: center;
+    
+    z-index: 1;
+    
+    box-shadow: 5px 5px 5px black;
+    -webkit-animation: gameover 500ms;
+    -moz-animation: gameover 500ms;
 }
 
 .jeweltype0 {

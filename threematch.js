@@ -34,7 +34,7 @@ document.addEventListener('visibilitychange', function(){
 */
 
 $(document).ready(function main() {
-	// Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
+    // Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
 
@@ -88,7 +88,7 @@ $(document).ready(function main() {
     var gemSize = cellSize - (cellMargin * 2);
 
     $(window).resize(function handleWindowResize() {        
-        console.log('handleWindowResize()');
+        //console.log('handleWindowResize()');
         
         var gameWidth = gameGrid.width() - cellMargin;
         var gameHeight = gameGrid.height() - cellMargin;
@@ -177,6 +177,8 @@ $(document).ready(function main() {
                 makeGem(i, j);
             }
         }
+        
+        checkGameOver();
     }
 
     function repositionGem(gem, row, col) {
@@ -200,7 +202,7 @@ $(document).ready(function main() {
     }
 
     function handleTap(target) {
-        console.log('handleTap(' + target + ')');
+        //console.log('handleTap(' + target + ')');
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
 		if (target.is(marker)) {
@@ -241,7 +243,7 @@ $(document).ready(function main() {
     }
 
     function handleSwipe(target, direction) {
-        console.log('handleSwipe(' + target + ', ' + direction + ')');
+        //console.log('handleSwipe(' + target + ', ' + direction + ')');
 
 		if (gameState == "pick") {
  		    // Row and column are encoded in cell's id
@@ -317,6 +319,7 @@ $(document).ready(function main() {
                         } else {
                             gameState = "pick";
                             selectedRow = empty;
+                            //checkGameOver();
                         }
                     } else {
                         gameState="remove";
@@ -381,6 +384,7 @@ $(document).ready(function main() {
 			} else {
 				gameState = "pick";
 				selectedRow = empty;
+				checkGameOver();
 			}
 		}
 	}
@@ -510,36 +514,66 @@ $(document).ready(function main() {
 		jewels[row][col] = empty;
 	}
 
-    // #mark Game Over (work in progress)
-    function checkHint() {
-        var possibleMoves = [];
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                //jewels[i][j] = empty;
-                if (getPossibleMoves(i, j)) {
-                    console.log('a move is possible');
-                }
+
+    function gameToString() {
+        var theGameString = "";
+        
+        for (j = 0; j < cols; j++) {
+            for (i = 0; i < rows; i++) {
+                theGameString += jewels[i][j];
             }
+            
+        theGameString += '\n';
+        }
+        
+        return theGameString;
+    }
+
+    function checkGameOver() {
+        if (!validMoveExists()) {
+            console.log('GAME OVER!');
+            $('#gameover').show();
         }
     }
 
-    function getPossibleMove(row, col) {
-        // Can make four possible moves
-        // left (col - 1)
-        if ((col - 1) >= 0) {
-        }
+    // #mark Game Over (work in progress)
+    function validMoveExists() {
+        // Such an elegant and fast solution using regular expressions.
+        // http://codegolf.stackexchange.com/questions/26505/determine-if-a-move-exists-in-a-bejeweled-match-3-game/26512#26512
         
-        // right (col + 1)
-        if ((col + 1) < cols) {
-        }
-        
-        // up  (row - 1)
-        if ((row - 1) >= 0) {
-        }
-        
-        // down (row + 1)
-        if ((row + 1) < rows) {
-        }
+        var gameString = gameToString();
+        var regExes = [
+            /(\d)\1\1/g,                 // 3-in-a-row horizontally
+            /(\d).\1\1/g,                // 3-in-a-row horizontally after left-most shifts right
+            /(\d)\1.\1/g,                // 3-in-a-row horizontally after right-most shifts left
+            /(\d)(?:.|\n){9}\1\1/g,  // 3-in-a-row horizontally after left-most shifts down
+            /(\d)(?:.|\n){7}\1.\1/g, // 3-in-a-row horizontally after middle shifts down
+            /(\d)(?:.|\n){6}\1\1/g,  // 3-in-a-row horizontally after right-most shifts down
+            /(\d)\1(?:.|\n){6}\1/g,  // 3-in-a-row horizontally after left-most shifts up
+            /(\d).\1(?:.|\n){7}\1/g, // 3-in-a-row horizontally after middle shifts up
+            /(\d)\1(?:.|\n){9}\1/g,  // 3-in-a-row horizontally after right-most shifts up
+            /(\d)(?:.|\n){7,9}\1(?:.|\n){8}\1/g, // 3-in-a-row vertically (with optional top shifting left or right)
+            /(\d)(?:.|\n){7}\1(?:.|\n){9}\1/g,   // 3-in-a-row vertically after middle shifts right
+            /(\d)(?:.|\n){9}\1(?:.|\n){7}\1/g,   // 3-in-a-row vertically after middle shifts left
+            /(\d)(?:.|\n){8}\1(?:.|\n){7}\1/g,   // 3-in-a-row vertically after bottom shifts right
+            /(\d)(?:.|\n){8}\1(?:.|\n){9}\1/g,   // 3-in-a-row vertically after bottom shifts left
+            /(\d)(?:.|\n){17}\1(?:.|\n){8}\1/g,  // 3-in-a-row vertically after top shifts down
+            /(\d)(?:.|\n){8}\1(?:.|\n){17}\1/g,  // 3-in-a-row vertically after bottom shifts up
+        ];                
+                
+        //console.log(gameString);
+        validMoves = 0;
+        regExes.forEach(function(pattern) {
+            var match = pattern.exec(gameString);
+            while (match != null) {
+                //console.log('at ' + match.index + ' found pattern "' + pattern + '" ==> ' + match);
+                validMoves++;
+                match = pattern.exec(gameString);
+            }
+        });
+
+        console.log('Valid Moves: ' + validMoves);        
+        return validMoves;
     }
 
 	function isVerticalStreak(row, col) {
@@ -698,4 +732,8 @@ function saveScore(score) {
     if (!highScore || score > highScore) {
         localStorage.highScore = score;
     }
+}
+
+function restartGame() {
+    location.reload();
 }
