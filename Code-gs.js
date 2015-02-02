@@ -1,11 +1,31 @@
-// Code.gs -- Maine Campus Crush 
-// Handle posting scores from Maine Campus Crush game to google spreadsheet
-// Return high scores
-// 
-// Based on:
-// https://mashe.hawksey.info/2014/07/google-sheets-as-a-database-insert-with-apps-script-using-postget-methods-with-ajax-example/
-//
+/* 
+ * Maine Campus Crush
+ *
+ * A Bejewled clone for public higher education in Maine.
+ * Client based on http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/
+ * Server based on https://mashe.hawksey.info/2014/07/google-sheets-as-a-database-insert-with-apps-script-using-postget-methods-with-ajax-example/
+ *
+ * February 1, 2015 - Stephen Houser
+ *
+ * Copyright (C) 2015 Stephen Houser
+ * This work is licensed inder a Creative Commons Attribution-Noncommercial-Share
+ * Alike 3.0 United States License (CC BY-NC-SA 3.0 US)
+ * http://creativecommons.org/licenses/by-nc-sa/3.0/us/
+ * ----------------------------------------------------------------------------
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * As long as you retain this notice you can do whatever you want with this stuff. 
+ * If we meet some day, and you think this stuff is worth it, you can buy me a beer
+ * in return. 
+ * ----------------------------------------------------------------------------
+ */
 
+/*
+ * Code.gs -- Google Script API for Score tracking
+ * Handles posting scores from Maine Campus Crush game to google spreadsheet.
+ * Return high scores for each team
+ * JSONP based to allow cross domain functionality.
+ */
+ 
 // Name of the sheets to modify and get data from
 var scoreSheetName = "All Scores";
 var leaderboardSheetName = "Leaderboard";
@@ -118,7 +138,7 @@ function handleResponse(request) {
         var highTeam = leaderboardValues[row][colTeam]      
         if (highTeam == team) { 
           // found my team
-          if (score > leaderboardValues[row][colTeam]) { 
+          if (score > parseInt(leaderboardValues[row][colTeam])) { 
             // new high score
             // update in-memory data
             leaderboardValues[row][colDate] = new Date();

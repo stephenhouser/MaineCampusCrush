@@ -1,9 +1,27 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<!-- http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/ -->
-<html>
+<!-- Maine Campus Crush
+  -
+  -- A Bejewled clone for public higher education in Maine.
+  -- Client based on http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/
+  -- Server based on https://mashe.hawksey.info/2014/07/google-sheets-as-a-database-insert-with-apps-script-using-postget-methods-with-ajax-example/
+  --
+  -- February 1, 2015 - Stephen Houser
+  --
+  -- Copyright (C) 2015 Stephen Houser
+  -- This work is licensed inder a Creative Commons Attribution-Noncommercial-Share
+  -- Alike 3.0 United States License (CC BY-NC-SA 3.0 US)
+  -- http://creativecommons.org/licenses/by-nc-sa/3.0/us/
+  -- ----------------------------------------------------------------------------
+  -- "THE BEER-WARE LICENSE" (Revision 42):
+  -- As long as you retain this notice you can do whatever you want with this stuff. 
+  -- If we meet some day, and you think this stuff is worth it, you can buy me a beer
+  -- in return. 
+  -- ----------------------------------------------------------------------------
+  -->
+<html lang="en">
 <head>
+<meta charset="utf-8"/>
 <title>Maine Campus Crush</title>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,15 +90,15 @@
 	<div id="playfor" title="Choose your team">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 		<ul>
-			<li class="jeweltype0" onClick="playFor(0);"><img src="" /><br/>Undeclared</li>
-			<li class="jeweltype1" onClick="playFor(1);"><img src="uma.png" /><br/>Moose</li>
-			<li class="jeweltype2" onClick="playFor(2);"><img src="umf.png" /><br/>Beavers</li>
-			<li class="jeweltype3" onClick="playFor(3);"><img src="umfk.png" /><br/>Bengals</li>
-			<li class="jeweltype4" onClick="playFor(4);"><img src="umm.png" /><br/>Clippers</li>			
-			<li class="jeweltype5" onClick="playFor(5);"><img src="umaine.png" /><br/>Black Bears</li>
-			<li class="jeweltype6" onClick="playFor(6);"><img src="usm.png" /><br/>Huskies</li>
-			<li class="jeweltype7" onClick="playFor(7);"><img src="umpi.png" /><br/>Owls</li>
-			<li class="jeweltype8" onClick="playFor(8);"><img src="ums.png" /><br/>System</li>
+			<li class="jeweltype5" onClick="playFor(5);"><img alt="UMaine" src="umaine.png" /><br/>Black Bears</li>
+			<li class="jeweltype6" onClick="playFor(6);"><img alt="USM" src="usm.png" /><br/>Huskies</li>
+			<li class="jeweltype1" onClick="playFor(1);"><img alt="UMA" src="uma.png" /><br/>Moose</li>
+			<li class="jeweltype7" onClick="playFor(7);"><img alt="UMPI" src="umpi.png" /><br/>Owls</li>
+			<li class="jeweltype2" onClick="playFor(2);"><img alt="UMF" src="umf.png" /><br/>Beavers</li>
+			<li class="jeweltype4" onClick="playFor(4);"><img alt="UMM" src="umm.png" /><br/>Clippers</li>			
+			<li class="jeweltype3" onClick="playFor(3);"><img alt="UMFK" src="umfk.png" /><br/>Bengals</li>
+			<li class="jeweltype8" onClick="playFor(8);"><img alt="UMS" src="ums.png" /><br/>System</li>
+			<li class="jeweltype0" onClick="playFor(0);"><img alt="" src="" /><br/>Undeclared</li>
 		</ul>
 	</div>
 
@@ -91,14 +109,14 @@
 		<br/>
 		<p>The campuses and mascots of the University of Maine System campuses are:</p>
 		<ul>
-			<li class="jeweltype1"><a href="http://uma.edu">UMA<br/><img src="uma.png" /><br/>Moose</a></li>
-			<li class="jeweltype2"><a href="http://umf.maine.edu">UMF<br/><img src="umf.png" /><br/>Beavers</a></li>
-			<li class="jeweltype3"><a href="http://umfk.edu">UMFK<br/><img src="umfk.png" /><br/>Bengals</a></li>
-			<li class="jeweltype4"><a href="http://machias.edu">UMM<br/><img src="umm.png" /><br/>Clippers</a></li>
-			<li class="jeweltype5"><a href="http://umaine.edu">UMaine<br/><img src="umaine.png" /><br/>Black Bears</a></li>
-			<li class="jeweltype6"><a href="http://usm.maine.edu"">USM<br/><img src="usm.png" /><br/>Huskies</a></li>
-			<li class="jeweltype7"><a href="http://umpi.edu">UMPI<br/><img src="umpi.png" /><br/>Owls</a></li>
-			<li class="jeweltype8"><a href="http://maine.edu">UMS<br/><img src="ums.png" /><br/>System</a></li>
+			<li class="jeweltype1"><a href="http://uma.edu">UMA<br/><img alt="UMA" src="uma.png" /><br/>Moose</a></li>
+			<li class="jeweltype2"><a href="http://umf.maine.edu">UMF<br/><img alt="UMF" src="umf.png" /><br/>Beavers</a></li>
+			<li class="jeweltype3"><a href="http://umfk.edu">UMFK<br/><img alt="UMFK" src="umfk.png" /><br/>Bengals</a></li>
+			<li class="jeweltype4"><a href="http://machias.edu">UMM<br/><img alt="UMM" src="umm.png" /><br/>Clippers</a></li>
+			<li class="jeweltype5"><a href="http://umaine.edu">UMaine<br/><img alt="UMaine" src="umaine.png" /><br/>Black Bears</a></li>
+			<li class="jeweltype6"><a href="http://usm.maine.edu"">USM<br/><img alt="USM" src="usm.png" /><br/>Huskies</a></li>
+			<li class="jeweltype7"><a href="http://umpi.edu">UMPI<br/><img alt="UMPI" src="umpi.png" /><br/>Owls</a></li>
+			<li class="jeweltype8"><a href="http://maine.edu">UMS<br/><img alt="UMS" src="ums.png" /><br/>System</a></li>
 		</ul>
 		<br/>
 		<p>The base code was adapted from
