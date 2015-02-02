@@ -1,0 +1,23 @@
+Things to clean up.
+
+Client:
+
+- Make some indication of what team you are playing for 
+    Somewhere while playing, on game over dialog, or on the leaderboard.
+    
+- How to detect "cascades" when dropping and filling trigger other indirect matches.
+
+- How to score "cascades"
+
+threematch.js:	// TODO: Check for removal of more than three tiles and adjust score multiplier	
+threematch.js:	// TODO: This might be redundant as valid cell is checked above.
+threematch.js:  // TODO: Document checkMoving()
+threematch.js:  // TODO: Document placeNewGems()
+threematch.js:  // TODO: Document checkFalling()
+threematch.js:  // TODO: Document removeGems()
+
+Server:
+
+Cannot log IP address in doPost() or doGet() in Google Apps Script. There is an existing
+feature request (open issue) at:
+https://code.google.com/p/google-apps-script-issues/issues/detail?id=2569&thanks=2569&ts=1364320993

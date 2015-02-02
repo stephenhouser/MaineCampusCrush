@@ -22,10 +22,14 @@
 // These are the major configuration options
 var cols         = 6;   // Number of columns
 var rows         = 8;   // Number of rows
-var jewelScore   = 10;  // Score for a single jewel
 var jewelTypes   = 8;   // Number of different types of "jewels" [1..jewelTypes]
 
-// (v4) The URL to post and get high scores to. Refer to Code.gs for details.
+// Each tile scores (fibonacci(x) * 10)
+var tileScores = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811];
+var tileScoreMultipler = 10;
+
+// The URL to post and get high scores to. Refer to Code.gs for details.
+// Must verify it is still the same after making a revision.
 var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
 
 // Constants
@@ -168,8 +172,8 @@ $(document).ready(function main() {
         currentScore = 0;
         saveScore(currentScore);
 
-        // Initialize all cells to -1 (empty)
-        // TODO: Do we need to pre-initialize all the cells this way?
+        // Initialize all cells to -1 (empty) 
+        // So that streak detection works in next loop.
         for (i = 0; i < rows; i++) {
             jewels[i] = new Array();
             for (j = 0; j < cols; j++) {
@@ -320,7 +324,7 @@ $(document).ready(function main() {
             if (trySwitch) {            // If adjacent cell exists, we can try to swap
     			selectSound.play();
     			
-    			// FIXME: This might be redundant as valid cell is checked above.
+    			// TODO: This might be redundant as valid cell is checked above.
                 // Try to swap if second selection was adjacent the first (marked) one
                 if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
                    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
@@ -329,6 +333,7 @@ $(document).ready(function main() {
                     gameState = "switch";
                     gemSwitch();
                 } else {
+                    alert('Do I ever get here? -- Yes!');
 				    // Selection was not adjacent, change selection to this one.
                     selectedRow = posY;
                     selectedCol = posX;
@@ -468,7 +473,10 @@ $(document).ready(function main() {
 
     // Animate tiles being removed from play
 	function gemFade() {
-	    // TODO: Check for removal of more than three tiles and adjust score multiplier	
+	    //console.log("gemFade " + $(".remove").length + " tiles");
+
+	    var tilesToRemove = $(".remove").length;
+	    
 		$.each($(".remove"), function() {
 			clearSound.play();
 			movingItems++;
@@ -481,9 +489,11 @@ $(document).ready(function main() {
 						$(this).remove();
 						checkMoving();
 
-						// Update score
-						//var score = parseInt($("#score").text(), 10) + 10;
-						currentScore += jewelScore;
+						// Update score -- based on tileScore array
+						//console.log("tilesToRemove = " + tilesToRemove 
+						//            + " currentScore += " + tileScores[tilesToRemove] * tileScoreMultipler);
+						//currentScore += tileScores[tilesToRemove--] * tileScoreMultipler;
+						
 						$("#score").text(currentScore);
 						saveScore(currentScore);
 					}
@@ -529,14 +539,10 @@ $(document).ready(function main() {
     // Remove get at (col, row) and others involved in a match (streak)
 	function removeGems(row, col) {
 		var gemValue = jewels[row][col];
-
-        // TODO: move to within vertical streak and declare in horizontal
-		var tmp = row;
-		// TODOL move to below streaks where tile is removed from model.
-		$("#gem_" + row + "_" + col).addClass("remove");
-
+		
 		if (isVerticalStreak(row, col)){
 		    // remove matching tiles above current tile
+    		var tmp = row;
 			while (tmp > 0 && jewels[tmp-1][col] == gemValue) {
 				$("#gem_" + (tmp-1) + "_" + col).addClass("remove");
 				jewels[tmp-1][col] = empty;
@@ -554,7 +560,7 @@ $(document).ready(function main() {
 
 		if (isHorizontalStreak(row, col)) {
 		    // remove matching tiles left of current tile
-			tmp = col;
+			var tmp = col;
 			while (tmp > 0 && jewels[row][tmp-1] == gemValue){
 				$("#gem_" + row + "_" + (tmp-1)).addClass("remove");
 				jewels[row][tmp-1] = empty;
@@ -570,7 +576,8 @@ $(document).ready(function main() {
 			}
 		}
 
-        // remove current tile
+        // Flag current tile for removal in DOM and actually remove it from the model.
+		$("#gem_" + row + "_" + col).addClass("remove");
 		jewels[row][col] = empty;
 	}
 
@@ -605,7 +612,6 @@ $(document).ready(function main() {
     // Game over when there are no valid moves left.
     function checkGameOver() {
         if (!validMoves()) {
-            console.log('GAME OVER!');
             gameOver();
         }
     }
@@ -647,12 +653,18 @@ $(document).ready(function main() {
         });
 
         // Update the UI valid move display
-        $('#moves').text('' + moves + ' valid moves');
-
-        console.log('Valid Moves: ' + validMoveCount);
+        if (validMoveCount) {
+            $('#moves').text('' + validMoveCount + ' valid moves');
+            //console.log('Valid Moves: ' + validMoveCount);
+        } else {
+            $('#moves').text('Game over');
+            //console.log('Game over');
+        }
         return validMoveCount;
     }
 
+    // Check for vertical streak (match) stemming from (col, row)
+    // Return true if one is found.
 	function isVerticalStreak(row, col) {
 		var gemValue = jewels[row][col];
 		var streak = 0;
@@ -672,6 +684,8 @@ $(document).ready(function main() {
 		return streak > 1;
 	}
 
+    // Check for horizontal streak (match) stemming from (col, row)
+    // Return true if one is found.
 	function isHorizontalStreak(row, col) {
 		var gemValue = jewels[row][col];
 		var streak = 0;
@@ -691,11 +705,16 @@ $(document).ready(function main() {
 		return streak > 1;
 	}
 
+    // Check for streak (match) stemming from (col, row)
+    // Return true if one is found.    
 	function isStreak(row, col) {
 	 	return isVerticalStreak(row, col) || isHorizontalStreak(row, col);
 	}
 });
 
+// The game is over, perform end of game housecleaning.
+// Post final score
+// Show Game Over dialog.
 function gameOver() {
 	postScore(currentScore);
 
@@ -726,6 +745,7 @@ function gameOver() {
     });
 }
 
+// Show the About dialog
 function showAbout() {
 	$("#about").dialog({
         position: { my: "top", at: "top+2%" },
@@ -739,6 +759,7 @@ function showAbout() {
     	    }
         },
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
     	        window.scrollTo(0, 0);
                 $('#about').dialog('close');
@@ -751,12 +772,14 @@ function showAbout() {
     });
 }
 
-// TODO: set localStorage.team to something on initialization
+// Set which team the player is playing for.
+// Used when reporting scores.
 function playFor(team) {
 	$("#playfor").dialog('close');
 	localStorage.team = myTeam = team;
 }
 
+// Show dialog to choose which team to play for.
 function showPlayFor() {
 	$("#playfor").dialog({
 		//dialogClass: 'no-close',
@@ -764,6 +787,7 @@ function showPlayFor() {
 		draggable: false,
 		modal: true,
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#playfor').dialog('close');
             })
@@ -775,17 +799,21 @@ function showPlayFor() {
 	});
 }
 
+// Load data into the leaderboard from the passed dictionary
+// Modify the leaderboard DOM elements
+// Sort the elements to display high score first.
 function loadLeaderboard(leaderboard) {
 	for (var team = 0; team < jewelTypes; team++) {
 		var teamData = leaderboard[team];
 		var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
 
-		console.log(team + ': '
-			+  scoreSpan.text() + ' to ' + teamData["score"]);
+		//console.log(team + ': '
+		//	+  scoreSpan.text() + ' to ' + teamData["score"]);
 
 		scoreSpan.text(teamData["score"]);
 	}
 
+    // TODO: Animate sorting of the leaderboard.
 	/* -- to sort the leaderboard */
 	var ul = $('ul#teamscores'),
 		li = ul.children('li');
@@ -799,26 +827,31 @@ function loadLeaderboard(leaderboard) {
 	ul.append(li);
 }
 
+// Show the leaderboard dialog
 function showLeaderboard() {
-    // Pull my high score
+    // Get player's high score from localStorage
     var highScore = localStorage.highScore;
     if (highScore) {
         $('#myscores  .score').text(highScore);
     }
 
+    // Load cached leaderboard data if available.
 	if (localStorage.leaderboard) {
 		loadLeaderboard(JSON.parse(localStorage.leaderboard));
 	}
 
-    // Pull high scores from "server"
+    // Send out a request to get more recent leaderboard data
+    // from the "server"
     $.ajax({
         url: scoreURL,
         cache : false,
         dataType: 'jsonp',
         success: function(data) {
+            // Put it into the DOM
             loadLeaderboard(data["leaderboard"]);
-			$('#teamscores ' + '.jeweltype0').hide();
-
+			$('#teamscores ' + '.loading').hide();
+			
+			// Cache a copy for next time....
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
         error: function(e) {
@@ -826,6 +859,7 @@ function showLeaderboard() {
         }
     });
 
+    // Show the actual dialog
 	$("#leaderboard").dialog({
         position: { my: "top", at: "top+2%" },
         close: function onCloseHighScore() {
@@ -833,6 +867,7 @@ function showLeaderboard() {
             window.scrollTo(0, 0);
         },
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#leaderboard').dialog('close');
             })
@@ -847,22 +882,25 @@ function showLeaderboard() {
     });
 }
 
+// Post score to the high score server. It's a rather simple affair.
 function postScore(score) {
 	var team = localStorage.team;
 
+    // Format of the data we can post.
 	var scoreData = {
 		"player" : playerName,
 		"team"   : team,
 		"score"  : score,
 	};
 
-    // Pull high scores from "server"
+    // Send the score to the server
     $.ajax({
         url: scoreURL,
         cache : false,
         dataType: 'jsonp',
         data: scoreData,
         success: function(data) {
+            // We get back leaderboard data, easy to cache it for when we want it.
             loadLeaderboard(data["leaderboard"]);
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
@@ -872,6 +910,9 @@ function postScore(score) {
     });
 }
 
+// Save score as we play.
+// Update player's high score
+// DOES NOT SEND TO THE SERVER!
 function saveScore(score) {
     localStorage.lastScore = score;
 
@@ -881,6 +922,7 @@ function saveScore(score) {
     }
 }
 
+// Restart the game
 function restartGame() {
     location.reload();
 }

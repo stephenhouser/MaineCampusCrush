@@ -187,7 +187,7 @@ a {
 
 #playfor {
 	padding: 5px;
-	cursor : pointer,
+	cursor : pointer;
 }
 
 .no-close .ui-dialog-titlebar-close {
