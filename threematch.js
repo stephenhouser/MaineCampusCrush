@@ -63,10 +63,10 @@ $(document).ready(function main() {
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
-            
+
         marker.show();
     };
-    
+
     // #mark Game Board setup
     // Initialize the game grid -- where the player plays...
     var gameGridId = 'gamefield';
@@ -75,9 +75,9 @@ $(document).ready(function main() {
     var cellMargin = parseInt(marker.css('margin-left'), 10);
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols); 
+    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols);
     if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
-        cellSize = Math.floor(gameGrid.width() / cols); 
+        cellSize = Math.floor(gameGrid.width() / cols);
     }
 
     // Reset game grid's height and width to what we really want.
@@ -87,14 +87,14 @@ $(document).ready(function main() {
 
     var gemSize = cellSize - (cellMargin * 2);
 
-    $(window).resize(function handleWindowResize() {        
+    $(window).resize(function handleWindowResize() {
         //console.log('handleWindowResize()');
-        
+
         var gameWidth = gameGrid.width() - cellMargin;
         var gameHeight = gameGrid.height() - cellMargin;
-        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols); 
+        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols);
         if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
-            cellSize = Math.floor(gameWidth / cols); 
+            cellSize = Math.floor(gameWidth / cols);
         }
 
         // Reset game grid's height and width to what we really want.
@@ -112,15 +112,15 @@ $(document).ready(function main() {
                 repositionGem($("#gem_" + i +"_" + j), i, j);
             }
         }
-        
+
         // TODO: Reposition marker as well.
         if (!marker.is(':hidden')) {
             marker.hide();
             marker.showAtCell($("#gem_" + selectedRow +"_" + selectedCol))
         }
-        
+
     });
-    
+
     // #mark Sound system initialization
     // Sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
@@ -152,7 +152,7 @@ $(document).ready(function main() {
     function resetGame() {
         currentScore = 0;
         saveScore(currentScore);
-        
+
         // Initialize all cells to -1 (empty)
         // TODO: Do we need to pre-initialize all the cells this way?
         for (i = 0; i < rows; i++) {
@@ -177,7 +177,7 @@ $(document).ready(function main() {
                 makeGem(i, j);
             }
         }
-        
+
         checkGameOver();
     }
 
@@ -194,10 +194,10 @@ $(document).ready(function main() {
         // Make and add the cell to the game grid
         var gemId = "gem_" + row +"_" + col;
         gameGrid.append('<div class="gem" id="' + gemId + '"></div>');
-        
+
         gem = $('#' + gemId);
         gem.addClass('jeweltype' + jewels[row][col]);
-        gem.swipe(swipeHandlers);        
+        gem.swipe(swipeHandlers);
         repositionGem(gem, row, col);
     }
 
@@ -206,19 +206,19 @@ $(document).ready(function main() {
 
         // If the marker gets selected (e.g. same cell tapped twice) unselect it.
 		if (target.is(marker)) {
-            marker.hide();			
+            marker.hide();
 			selectedRow = selectedCol = empty;
 			return;
 		}
 
- 		if (gameState == "pick") { 		
+ 		if (gameState == "pick") {
  		    // Row and column are encoded in cell's id
  		    var targetId = target.attr('id').split('_');
             var targetRow = parseInt(targetId[1], 10);
             var targetCol = parseInt(targetId[2], 10);
- 		    
+
             marker.showAtCell(target);
-            
+
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
 
@@ -230,7 +230,7 @@ $(document).ready(function main() {
 
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-				    
+
                     marker.hide();
     				gameState = "switch";
 					gemSwitch();
@@ -250,11 +250,11 @@ $(document).ready(function main() {
  		    var targetId = target.attr('id').split('_');
             posY = selectedRow = parseInt(targetId[1], 10);
    			posX = selectedCol = parseInt(targetId[2], 10);
- 		    
+
             // TODO: Animate the selected cell?
             marker.showAtCell(target);
 			selectSound.play();
-			
+
             var trySwitch = false;
             switch (direction) {
                 case "up":
@@ -517,22 +517,22 @@ $(document).ready(function main() {
 
     function gameToString() {
         var theGameString = "";
-        
+
         for (j = 0; j < cols; j++) {
             for (i = 0; i < rows; i++) {
                 theGameString += jewels[i][j];
             }
-            
+
         theGameString += '\n';
         }
-        
+
         return theGameString;
     }
 
     function checkGameOver() {
         var moves = validMoves();
         $('#moves').text('' + moves + ' valid moves');
-        
+
         if (!moves) {
             console.log('GAME OVER!');
             gameOver();
@@ -543,7 +543,7 @@ $(document).ready(function main() {
     function validMoves() {
         // Such an elegant and fast solution using regular expressions.
         // http://codegolf.stackexchange.com/questions/26505/determine-if-a-move-exists-in-a-bejeweled-match-3-game/26512#26512
-        
+
         var gameString = gameToString();
         var regExes = [
             /(\d)\1\1/g,                 // 3-in-a-row horizontally
@@ -562,8 +562,8 @@ $(document).ready(function main() {
             /(\d)(?:.|\n){8}\1(?:.|\n){9}\1/g,   // 3-in-a-row vertically after bottom shifts left
             /(\d)(?:.|\n){17}\1(?:.|\n){8}\1/g,  // 3-in-a-row vertically after top shifts down
             /(\d)(?:.|\n){8}\1(?:.|\n){17}\1/g,  // 3-in-a-row vertically after bottom shifts up
-        ];                
-                
+        ];
+
         //console.log(gameString);
         validMoveCount = 0;
         regExes.forEach(function(pattern) {
@@ -575,7 +575,7 @@ $(document).ready(function main() {
             }
         });
 
-        console.log('Valid Moves: ' + validMoveCount);        
+        console.log('Valid Moves: ' + validMoveCount);
         return validMoveCount;
     }
 
@@ -626,9 +626,9 @@ function gameOver() {
     var gameOverDialog = $('#gameover');
     var lastScore = gameOverDialog.find('#lastscore');
     var highScore = gameOverDialog.find('#highscore');
-    
+
     lastScore.text(localStorage.lastScore);
-    highScore.text(localStorage.highScore);   
+    highScore.text(localStorage.highScore);
 
     gameOverDialog.dialog({
 	    dialogClass: 'no-close',
@@ -645,7 +645,7 @@ function gameOver() {
             click: function() {
                 $(this).dialog("close");
                 showLeaderboard();
-            }            
+            }
         }]
     });
 }
@@ -697,6 +697,7 @@ function showPlayFor() {
 	});
 }
 
+// v4
 var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
 
 function showLeaderboard() {
@@ -705,35 +706,35 @@ function showLeaderboard() {
     if (highScore) {
         $('#myscores  .score').text(highScore);
     }
-		    
+
     // Pull high scores from "server"
     $.ajax({
-        url: 'hiscore.json',
+        url: scoreURL,
         cache : false,
-        datatype: 'jsonp',
+        dataType: 'jsonp',
         success: function(data) {
             var leaderboard = data["leaderboard"];
             for (var team = 0; team < jewelTypes; team++) {
                 var teamData = leaderboard[team];
                 var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
-                
-                console.log(team + ': ' 
+
+                console.log(team + ': '
                     +  scoreSpan.text() + ' to ' + teamData["score"]);
 
                 scoreSpan.text(teamData["score"]);
             }
-            
+
             /* -- to sort the leaderboard */
             var ul = $('ul#teamscores'),
                 li = ul.children('li');
-    
+
             li.detach().sort(function(a,b) {
                 var scoreA = parseInt($(a).children('.score').text());
                 var scoreB = parseInt($(b).children('.score').text());
                 return scoreB - scoreA;
             });
-    
-            ul.append(li);            
+
+            ul.append(li);
         },
         error: function(e) {
             console.log(e);
