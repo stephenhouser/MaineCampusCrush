@@ -136,10 +136,8 @@ function handleResponse(request) {
       // Loop through all teams finding a match. Undeclared folks get team=0 above
       for (var row in leaderboardValues) {
         var highTeam = leaderboardValues[row][colTeam]      
-        if (highTeam == team) { 
-          // found my team
-          if (score > parseInt(leaderboardValues[row][colTeam])) { 
-            // new high score
+        if (highTeam == team) {                           // found my team
+          if (score > leaderboardValues[row][colScore]) { // new high score!
             // update in-memory data
             leaderboardValues[row][colDate] = new Date();
             leaderboardValues[row][colScore] = score;
