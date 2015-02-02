@@ -58,7 +58,7 @@
 	<div id="gamefield">
     	<div id="marker" class="gem"></div>
 	</div>
-	
+
 	<div id="footer">
 	    <div class="center"><span id="moves">0</span></div>
 	</div>
@@ -68,18 +68,18 @@
 		<p>Score: <span id="lastscore" class="score">0</span></p>
 		<p>High score: <span id="highscore" class="score">0</span></p>
 	</div>
-	
+
 	<div id="playfor" title="Choose your team">
 		<span class="ui-helper-hidden-accessible"><input type="button"/></span>
 		<ul>
-			<li class="jeweltype0" onClick="hidePlayFor();"><img src="umaine.png" /><br/>Black Bears</li>
-			<li class="jeweltype1" onClick="hidePlayFor();"><img src="usm.png" /><br/>Huskies</li>
-			<li class="jeweltype2" onClick="hidePlayFor();"><img src="uma.png" /><br/>Moose</li>
-			<li class="jeweltype4" onClick="hidePlayFor();"><img src="umpi.png" /><br/>Owls</li>
-			<li class="jeweltype3" onClick="hidePlayFor();"><img src="umf.png" /><br/>Beavers</li>
-			<li class="jeweltype5" onClick="hidePlayFor();"><img src="umm.png" /><br/>Clippers</li>
-			<li class="jeweltype6" onClick="hidePlayFor();"><img src="umfk.png" /><br/>Bengals</li>
-			<li class="jeweltype7" onClick="hidePlayFor();"><img src="ums.png" /><br/>System</li>
+			<li class="jeweltype0" onClick="playFor(0);"><img src="umaine.png" /><br/>Black Bears</li>
+			<li class="jeweltype1" onClick="playFor(1);"><img src="usm.png" /><br/>Huskies</li>
+			<li class="jeweltype2" onClick="playFor(2);"><img src="uma.png" /><br/>Moose</li>
+			<li class="jeweltype4" onClick="playFor(3);"><img src="umpi.png" /><br/>Owls</li>
+			<li class="jeweltype3" onClick="playFor(4);"><img src="umf.png" /><br/>Beavers</li>
+			<li class="jeweltype5" onClick="playFor(5);"><img src="umm.png" /><br/>Clippers</li>
+			<li class="jeweltype6" onClick="playFor(6);"><img src="umfk.png" /><br/>Bengals</li>
+			<li class="jeweltype7" onClick="playFor(7);"><img src="ums.png" /><br/>System</li>
 		</ul>
 	</div>
 
@@ -118,6 +118,7 @@
 		</ul>
 		<hr/>
 		<ul id="teamscores">
+			<li class="loading"><p>Updating...</p></li>
 			<li class="jeweltype7"><p>System</p> <span class="score">0</span></li>
 			<li class="jeweltype1"><p>Huskies</p> <span class="score">0</span></li>
 			<li class="jeweltype0"><p>Black Bears</p> <span class="score">0</span></li>
@@ -130,6 +131,6 @@
     </div>
 
 	<div id="splash"><img src="splash.png"/>
-	</div>	
+	</div>
 </body>
 </html>

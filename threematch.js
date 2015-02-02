@@ -8,11 +8,16 @@ var rows         = 8;   // Number of rows
 var jewelScore   = 10;  // Score for a single jewel
 var jewelTypes   = 8;   // Number of different types of "jewels"
 
+// (v4) The URL to post and get high scores to.
+var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
+
 // Constants
 var empty = -1;         // representation of empty cell or invalid selection
 
 // Internal variables
 var currentScore = 0;   // Current game score
+var playerName = "";	// Initials only please
+var myTeam = 0;			// 0 is undeclared
 
 var selectedRow = empty;    // Currently selected (highlighted) row
 var selectedCol = empty;    // Currently selected (highlighted) column
@@ -623,6 +628,8 @@ $(document).ready(function main() {
 });
 
 function gameOver() {
+	postScore(currentScore);
+
     var gameOverDialog = $('#gameover');
     var lastScore = gameOverDialog.find('#lastscore');
     var highScore = gameOverDialog.find('#highscore');
@@ -675,8 +682,10 @@ function showAbout() {
     });
 }
 
-function hidePlayFor() {
+// TODO: set localStorage.team to something on initialization
+function playFor(team) {
 	$("#playfor").dialog('close');
+	localStorage.team = myTeam = team;
 }
 
 function showPlayFor() {
@@ -697,8 +706,29 @@ function showPlayFor() {
 	});
 }
 
-// v4
-var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
+function loadLeaderboard(leaderboard) {
+	for (var team = 0; team < jewelTypes; team++) {
+		var teamData = leaderboard[team];
+		var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
+
+		console.log(team + ': '
+			+  scoreSpan.text() + ' to ' + teamData["score"]);
+
+		scoreSpan.text(teamData["score"]);
+	}
+
+	/* -- to sort the leaderboard */
+	var ul = $('ul#teamscores'),
+		li = ul.children('li');
+
+	li.detach().sort(function(a,b) {
+		var scoreA = parseInt($(a).children('.score').text());
+		var scoreB = parseInt($(b).children('.score').text());
+		return scoreB - scoreA;
+	});
+
+	ul.append(li);
+}
 
 function showLeaderboard() {
     // Pull my high score
@@ -707,34 +737,20 @@ function showLeaderboard() {
         $('#myscores  .score').text(highScore);
     }
 
+	if (localStorage.leaderboard) {
+		loadLeaderboard(JSON.parse(localStorage.leaderboard));
+	}
+
     // Pull high scores from "server"
     $.ajax({
         url: scoreURL,
         cache : false,
         dataType: 'jsonp',
         success: function(data) {
-            var leaderboard = data["leaderboard"];
-            for (var team = 0; team < jewelTypes; team++) {
-                var teamData = leaderboard[team];
-                var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
+            loadLeaderboard(data["leaderboard"]);
+			$('#teamscores ' + '.loading').hide();
 
-                console.log(team + ': '
-                    +  scoreSpan.text() + ' to ' + teamData["score"]);
-
-                scoreSpan.text(teamData["score"]);
-            }
-
-            /* -- to sort the leaderboard */
-            var ul = $('ul#teamscores'),
-                li = ul.children('li');
-
-            li.detach().sort(function(a,b) {
-                var scoreA = parseInt($(a).children('.score').text());
-                var scoreB = parseInt($(b).children('.score').text());
-                return scoreB - scoreA;
-            });
-
-            ul.append(li);
+			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
         error: function(e) {
             console.log(e);
@@ -759,6 +775,31 @@ function showLeaderboard() {
                 showPlayFor();
             }
         }]
+    });
+}
+
+function postScore(score) {
+	var team = localStorage.team;
+
+	var scoreData = {
+		"player" : playerName,
+		"team"   : team,
+		"score"  : score,
+	};
+
+    // Pull high scores from "server"
+    $.ajax({
+        url: scoreURL,
+        cache : false,
+        dataType: 'jsonp',
+        data: scoreData,
+        success: function(data) {
+            loadLeaderboard(data["leaderboard"]);
+			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
+        },
+        error: function(e) {
+            console.log(e);
+        }
     });
 }
 
