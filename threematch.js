@@ -6,7 +6,7 @@
 var cols         = 6;   // Number of columns
 var rows         = 8;   // Number of rows
 var jewelScore   = 10;  // Score for a single jewel
-var jewelTypes   = 8;   // Number of different types of "jewels"
+var jewelTypes   = 8;   // Number of different types of "jewels" [1..jewelTypes]
 
 // (v4) The URL to post and get high scores to.
 var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
@@ -172,10 +172,12 @@ $(document).ready(function main() {
             for (j = 0; j < cols; j++) {
                 // Fill cell with a random jewel that will NOT cause a "streak" (3-match)
                 do {
+                    // Standard version. +1 is to make range [1..?] rather than [0..?]
+                    //jewels[i][j] = Math.floor(Math.random() * jewelTypes) + 1;
+                    
                     // The "system takes over" version
                     // The system tiles (jewltype7) are not selected in setup.
-                    jewels[i][j] = Math.floor(Math.random() * (jewelTypes - 1));
-                    //jewels[i][j] = Math.floor(Math.random() * jewelTypes);
+                    jewels[i][j] = Math.floor(Math.random() * (jewelTypes - 1)) + 1;
                 } while (isStreak(i, j));
 
                 // Make and add the cell to the gamefield
@@ -356,7 +358,8 @@ $(document).ready(function main() {
 
 		for (i = 0; i < cols; i++) {
 			if (jewels[0][i] == empty) {
-				jewels[0][i] = Math.floor(Math.random() * jewelTypes);
+                // +1 is to make range [1..?] rather than [0..?]
+				jewels[0][i] = Math.floor(Math.random() * jewelTypes) + 1;
                 makeGem(0, i);
           		gemsPlaced++;
 				dropSound.play();
@@ -748,7 +751,7 @@ function showLeaderboard() {
         dataType: 'jsonp',
         success: function(data) {
             loadLeaderboard(data["leaderboard"]);
-			$('#teamscores ' + '.loading').hide();
+			$('#teamscores ' + '.jeweltype0').hide();
 
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },

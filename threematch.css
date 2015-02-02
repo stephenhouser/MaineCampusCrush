@@ -116,41 +116,46 @@ a {
 }
 
 .jeweltype0 {
-	background-color: #75B2DD;
-	background-image: url(umaine.png)	;
+	background-color: white;
+	background-image: url(icon.png);
 }
 
 .jeweltype1 {
-	background-color: rgba(0, 56, 147, 0.6);
-	background-image: url(usm.png);
-}
-
-.jeweltype2 {
 	background-color: #60C659;
 	background-image: url(uma.png);
 }
 
-.jeweltype3 {
+.jeweltype2 {
 	background-color: maroon;
 	background-image: url(umf.png);
 }
 
-.jeweltype4 {
-	background-color: gold;
-	background-image: url(umpi.png);
-}
-
-.jeweltype5 {
-	background-color: green;
-	background-image: url(umm.png);
-}
-
-.jeweltype6 {
+.jeweltype3 {
 	background-color: gold;
 	background-image: url(umfk.png);
 }
 
+.jeweltype4 {
+	background-color: green;
+	background-image: url(umm.png);
+}
+
+.jeweltype5 {
+	background-color: #75B2DD;
+	background-image: url(umaine.png)	;
+}
+
+.jeweltype6 {
+	background-color: rgba(0, 56, 147, 0.6);
+	background-image: url(usm.png);
+}
+
 .jeweltype7 {
+	background-color: gold;
+	background-image: url(umpi.png);
+}
+
+.jeweltype8 {
 	background-color: white;
 	background-image: url(ums.png);
 }
