@@ -1,0 +1,18 @@
+Things to clean up.
+
+Client:
+
+threematch.js:        // TODO: Do we need to pre-initialize all the cells this way?
+threematch.js:    // TODO: Document checkMoving()
+threematch.js:    // TODO: Document placeNewGems()
+threematch.js:    // TODO: Document checkFalling()
+threematch.js:	    // TODO: Check for removal of more than three tiles and adjust score multiplier	
+threematch.js:    // TODO: Document removeGems()
+threematch.js:        // TODO: move to within vertical streak and declare in horizontal
+threematch.js:// TODO: set localStorage.team to something on initialization
+
+Server:
+
+Cannot log IP address in doPost() or doGet() in Google Apps Script. There is an existing
+feature request (open issue) at:
+https://code.google.com/p/google-apps-script-issues/issues/detail?id=2569&thanks=2569&ts=1364320993

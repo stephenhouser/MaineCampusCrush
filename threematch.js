@@ -25,7 +25,8 @@ var rows         = 8;   // Number of rows
 var jewelScore   = 10;  // Score for a single jewel
 var jewelTypes   = 8;   // Number of different types of "jewels" [1..jewelTypes]
 
-// (v4) The URL to post and get high scores to. Refer to Code.gs for details.
+// The URL to post and get high scores to. Refer to Code.gs for details.
+// Must verify it is still the same after making a revision.
 var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
 
 // Constants

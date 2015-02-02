@@ -24,6 +24,8 @@
  * Handles posting scores from Maine Campus Crush game to google spreadsheet.
  * Return high scores for each team
  * JSONP based to allow cross domain functionality.
+ * ** This script is "bound" to the containing Google Spreadsheet! **
+ * https://developers.google.com/apps-script/guides/bound
  */
  
 // Name of the sheets to modify and get data from
@@ -172,7 +174,7 @@ function handleResponse(request) {
     var results = JSONPify(callbackFunctionName, {
       "result"     : "success", 
       "parameters" : request.parameters,
-      "row"        : nextRow,
+      "scores"     : nextRow,
       "leaderboard": leaderboard
     });    
 

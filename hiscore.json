@@ -1,1 +1,16 @@
-{"result":"success","parameters":{"callback":["cb"]},"leaderboard":{"0":{"date":"2015-02-01T21:10:50.155Z","score":10,"player":"","campus":"","mascot":""},"1":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMA","mascot":"Moose"},"2":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMF","mascot":"Beavers"},"3":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMFK","mascot":"Bengals"},"4":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMM","mascot":"Owls"},"5":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMaine","mascot":"Black Bears"},"6":{"date":"2015-02-01T21:55:42.988Z","score":1024,"player":"sah","campus":"USM","mascot":"Huskies"},"7":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMPI","mascot":"Clippers"},"8":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMS","mascot":"Blue Ball"}}}
+callback({
+   "result":"success",
+   "parameters":{"player":["sah"],"score":["10"],"callback":["cb"],"team":["6"]},
+   "row":3,
+   "leaderboard":{
+       "0":{"date":"2015-02-02T18:03:58.113Z","score":0,"player":"","campus":"","mascot":""},
+       "1":{"date":"2015-02-02T03:40:58.596Z","score":0,"player":"","campus":"UMA","mascot":"Moose"},
+       "2":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMF","mascot":"Beavers"},
+       "3":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMFK","mascot":"Bengals"},
+       "4":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMM","mascot":"Owls"},
+       "5":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMaine","mascot":"Black Bears"},
+       "6":{"date":"2015-02-02T18:19:06.195Z","score":2970,"player":"sah","campus":"USM","mascot":"Huskies"},
+       "7":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMPI","mascot":"Clippers"},
+       "8":{"date":"2015-02-01T05:00:00.000Z","score":0,"player":"","campus":"UMS","mascot":"Blue Ball"}
+   }
+})
