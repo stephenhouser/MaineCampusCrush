@@ -1,18 +1,40 @@
 /*
-
-*/
+ * Maine Campus Crush
+ *
+ * A Bejewled clone for public higher education in Maine.
+ * Client based on http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/
+ * Server based on https://mashe.hawksey.info/2014/07/google-sheets-as-a-database-insert-with-apps-script-using-postget-methods-with-ajax-example/
+ *
+ * February 1, 2015 - Stephen Houser
+ *
+ * Copyright (C) 2015 Stephen Houser
+ * This work is licensed inder a Creative Commons Attribution-Noncommercial-Share
+ * Alike 3.0 United States License (CC BY-NC-SA 3.0 US)
+ * http://creativecommons.org/licenses/by-nc-sa/3.0/us/
+ * ----------------------------------------------------------------------------
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * As long as you retain this notice you can do whatever you want with this stuff. 
+ * If we meet some day, and you think this stuff is worth it, you can buy me a beer
+ * in return. 
+ * ----------------------------------------------------------------------------
+ */
 
 // These are the major configuration options
 var cols         = 6;   // Number of columns
 var rows         = 8;   // Number of rows
 var jewelScore   = 10;  // Score for a single jewel
-var jewelTypes   = 8;   // Number of different types of "jewels"
+var jewelTypes   = 8;   // Number of different types of "jewels" [1..jewelTypes]
+
+// (v4) The URL to post and get high scores to. Refer to Code.gs for details.
+var scoreURL = "https://script.google.com/macros/s/AKfycbwBINdsC6ygyp2ojzFboO_cRxvS0U1joxWfUkNhfT-XDHiK_kU/exec"
 
 // Constants
 var empty = -1;         // representation of empty cell or invalid selection
 
 // Internal variables
 var currentScore = 0;   // Current game score
+var playerName = "";	// Initials only please
+var myTeam = 0;			// 0 is undeclared
 
 var selectedRow = empty;    // Currently selected (highlighted) row
 var selectedCol = empty;    // Currently selected (highlighted) column
@@ -33,7 +55,10 @@ document.addEventListener('visibilitychange', function(){
 	},false);
 */
 
+// Document ready handler -- otherwise known as main() herein.
 $(document).ready(function main() {
+
+    // Set up to use jquery.transit for CSS-based animations (faster)
     // Delegate .transition() calls to .animate() if the browser can't do CSS transitions.
 	if (!$.support.transition)
 	  $.fn.transition = $.fn.animate;
@@ -48,10 +73,9 @@ $(document).ready(function main() {
         }
     }
 
-    // #mark Marker setup
-    // Initialize the visual marker -- where the player taps...
+    // Initialize the visual marker that highlights tapped cells.
     var marker = $('#marker');
-    marker.hide(); // should be display: none in CSS already. Be safe.
+    marker.hide(); // should be display:none in CSS already. Be safe.
     marker.swipe(swipeHandlers);
     marker.showAtCell = function(targetCell) {
         // Position the "marker" to show which cell we have selected.
@@ -63,45 +87,34 @@ $(document).ready(function main() {
             "height" : gemSize + "px",
             "width"  : gemSize + "px"
         });
-            
+
         marker.show();
     };
-    
+
     // #mark Game Board setup
-    // Initialize the game grid -- where the player plays...
+
+    // Initialize the game grid based on where it got laid out
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
-
     var cellMargin = parseInt(marker.css('margin-left'), 10);
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
-    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols); 
+    var cellSize = Math.floor(Math.min(gameGrid.width(), gameGrid.height()) / cols);
     if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
-        cellSize = Math.floor(gameGrid.width() / cols); 
+        cellSize = Math.floor(gameGrid.width() / cols);
     }
-
-    // Reset game grid's height and width to what we really want.
-    // Include the margin given to each cell
-    //gameGrid.height((cellSize * rows) + cellMargin);
-    //gameGrid.width((cellSize * cols) + cellMargin);
 
     var gemSize = cellSize - (cellMargin * 2);
 
-    $(window).resize(function handleWindowResize() {        
+    // Set up to capture window resizes to resize the game grid and cells
+    $(window).resize(function handleWindowResize() {
         //console.log('handleWindowResize()');
-        
         var gameWidth = gameGrid.width() - cellMargin;
         var gameHeight = gameGrid.height() - cellMargin;
-        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols); 
+        cellSize = Math.floor(Math.min(gameWidth, gameHeight) / cols);
         if (cellSize <= 0) { // gameGrid.height() often fails in app-mode
-            cellSize = Math.floor(gameWidth / cols); 
+            cellSize = Math.floor(gameWidth / cols);
         }
-
-        // Reset game grid's height and width to what we really want.
-        // Include the margin given to each cell
-        //gameGrid.css({'height':'', 'width':''});
-        //gameGrid.height((cellSize * rows) + cellMargin);
-        //gameGrid.width((cellSize * cols) + cellMargin);
 
         gemSize = cellSize - (cellMargin * 2);
 
@@ -112,17 +125,17 @@ $(document).ready(function main() {
                 repositionGem($("#gem_" + i +"_" + j), i, j);
             }
         }
-        
-        // TODO: Reposition marker as well.
+
+        // Reposition the marker 
         if (!marker.is(':hidden')) {
-            marker.hide();
             marker.showAtCell($("#gem_" + selectedRow +"_" + selectedCol))
         }
-        
+
     });
-    
+
     // #mark Sound system initialization
-    // Sounds, using howler.js (howlerjs.com)
+    
+    // Initialize sounds, using howler.js (howlerjs.com)
 	var clearSound = new Howl({urls: ['clear.wav']});
 	var dropSound = new Howl({urls: ['drop.wav']});
 	var selectSound = new Howl({urls: ['select.wav']});
@@ -143,16 +156,18 @@ $(document).ready(function main() {
 		}).play();
 	*/
 
-
-    // #mark End initialization
-    resetGame();
+    // And start the game!
+    playGame();
 	//showPlayFor();
 
-    // #mark Document Functions
-    function resetGame() {
+    // #mark Game Functions
+    
+    // Start a game
+    // Resets the score and all the tiles
+    function playGame() {
         currentScore = 0;
         saveScore(currentScore);
-        
+
         // Initialize all cells to -1 (empty)
         // TODO: Do we need to pre-initialize all the cells this way?
         for (i = 0; i < rows; i++) {
@@ -162,25 +177,28 @@ $(document).ready(function main() {
             }
         }
 
-        // Fill all cells
+        // Fill all cells with initial tiles/jewels
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
                 // Fill cell with a random jewel that will NOT cause a "streak" (3-match)
                 do {
+                    // Standard version. +1 is to make range [1..?] rather than [0..?]
+                    //jewels[i][j] = Math.floor(Math.random() * jewelTypes) + 1;
+                    
                     // The "system takes over" version
-                    // The system tiles (jewltype7) are not selected in setup.
-                    jewels[i][j] = Math.floor(Math.random() * (jewelTypes - 1));
-                    //jewels[i][j] = Math.floor(Math.random() * jewelTypes);
+                    // The jewltype8 tiles are not selected in setup.
+                    jewels[i][j] = Math.floor(Math.random() * (jewelTypes - 1)) + 1;
                 } while (isStreak(i, j));
 
                 // Make and add the cell to the gamefield
                 makeGem(i, j);
             }
         }
-        
+
         checkGameOver();
     }
 
+    // Move a gem to the window location corresponding to (col, row)
     function repositionGem(gem, row, col) {
         gem.css({
             "top"    : (row * cellSize) + "px",
@@ -190,35 +208,43 @@ $(document).ready(function main() {
         });
     }
 
+    // Make a new gem and position it at (col, row)
     function makeGem(row, col) {
         // Make and add the cell to the game grid
         var gemId = "gem_" + row +"_" + col;
         gameGrid.append('<div class="gem" id="' + gemId + '"></div>');
-        
+
         gem = $('#' + gemId);
         gem.addClass('jeweltype' + jewels[row][col]);
-        gem.swipe(swipeHandlers);        
+        gem.swipe(swipeHandlers);
         repositionGem(gem, row, col);
     }
 
+    // == Tap Handler ==
+    // Select tile that player tapped on, possibly trying to swap with
+    // previous selection.
     function handleTap(target) {
         //console.log('handleTap(' + target + ')');
 
-        // If the marker gets selected (e.g. same cell tapped twice) unselect it.
+        // If thy player tapped the marker (which is covering the currently
+        // selected tile, unselect it.
 		if (target.is(marker)) {
-            marker.hide();			
+            marker.hide();
 			selectedRow = selectedCol = empty;
 			return;
 		}
 
- 		if (gameState == "pick") { 		
- 		    // Row and column are encoded in cell's id
+        // If we are waiting for the player to choose a tile...
+ 		if (gameState == "pick") {
+ 		    // Determine which tile was selected based on it's selector/id
+ 		    // Row and column are encoded in cell's id -- "gem_<row>_<col>"
  		    var targetId = target.attr('id').split('_');
             var targetRow = parseInt(targetId[1], 10);
             var targetCol = parseInt(targetId[2], 10);
- 		    
+
+            // Show the marker to highlight the cell
             marker.showAtCell(target);
-            
+
 			if (selectedRow == empty) {		    // First cell selection
 				selectSound.play();
 
@@ -228,13 +254,15 @@ $(document).ready(function main() {
 			    posY = targetRow;
 			    posX = targetCol;
 
+                // Try to swap if second selection was adjacent the first (marked) one
 				if ((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
 				    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
-				    
-                    marker.hide();
+                    marker.hide(); 
+                    
     				gameState = "switch";
 					gemSwitch();
 				} else {
+				    // Selection was not adjacent, change selection to this one.
 					selectedRow = posY;
 					selectedCol = posX;
 				}
@@ -242,19 +270,24 @@ $(document).ready(function main() {
 		}
     }
 
+    // == Swipe Handler ==
+    // Select tile that player started swiping from and try to swap it with the 
+    // one adjacent in the direction of the swipe.
     function handleSwipe(target, direction) {
         //console.log('handleSwipe(' + target + ', ' + direction + ')');
 
+        // If we are waiting for the player to choose a tile...
 		if (gameState == "pick") {
- 		    // Row and column are encoded in cell's id
+ 		    // Determine which tile was selected based on it's selector/id
+ 		    // Row and column are encoded in cell's id -- "gem_<row>_<col>"
  		    var targetId = target.attr('id').split('_');
             posY = selectedRow = parseInt(targetId[1], 10);
    			posX = selectedCol = parseInt(targetId[2], 10);
- 		    
-            // TODO: Animate the selected cell?
+
+            // Show the marker to highlight the cell
             marker.showAtCell(target);
-			selectSound.play();
-			
+
+            // Use direction of swipe to determine adjacent cell, or off-game
             var trySwitch = false;
             switch (direction) {
                 case "up":
@@ -283,18 +316,24 @@ $(document).ready(function main() {
                     break;
             }
 
-            if (trySwitch) {
+            
+            if (trySwitch) {            // If adjacent cell exists, we can try to swap
+    			selectSound.play();
+    			
+    			// FIXME: This might be redundant as valid cell is checked above.
+                // Try to swap if second selection was adjacent the first (marked) one
                 if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
                    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
                     marker.hide();
+                    
                     gameState = "switch";
                     gemSwitch();
                 } else {
+				    // Selection was not adjacent, change selection to this one.
                     selectedRow = posY;
                     selectedCol = posX;
                 }
-            } else {
-                // swiped out of bounds...
+            } else {                    // swiped out of bounds...
                 errorSound.play();
 
                 marker.hide();
@@ -304,6 +343,7 @@ $(document).ready(function main() {
 		}
     }
 
+    // TODO: Document checkMoving()
 	function checkMoving() {
 		movingItems--;
 
@@ -346,12 +386,16 @@ $(document).ready(function main() {
         }
 	}
 
-	function placeNewGems() {
+    // TODO: Document placeNewGems()
+    // Place new tiles into empty locations on game board
+    // Really only checks and fills the top row, tiles fall from there.
+    function placeNewGems() {
 		var gemsPlaced = 0;
-
+		
 		for (i = 0; i < cols; i++) {
 			if (jewels[0][i] == empty) {
-				jewels[0][i] = Math.floor(Math.random() * jewelTypes);
+                // +1 is to make range [1..?] rather than [0..?]
+				jewels[0][i] = Math.floor(Math.random() * jewelTypes) + 1;
                 makeGem(0, i);
           		gemsPlaced++;
 				dropSound.play();
@@ -389,6 +433,7 @@ $(document).ready(function main() {
 		}
 	}
 
+    // TODO: Document checkFalling()
 	function checkFalling(){
 		var fellDown = 0;
 
@@ -421,10 +466,13 @@ $(document).ready(function main() {
 		}
 	}
 
+    // Animate tiles being removed from play
 	function gemFade() {
+	    // TODO: Check for removal of more than three tiles and adjust score multiplier	
 		$.each($(".remove"), function() {
 			clearSound.play();
 			movingItems++;
+			
 			$(this)
 				.transition({ scale: 1.25 }, { duration: 100 })
 				.transition({ opacity:0, scale: 0.1 }, {
@@ -443,6 +491,8 @@ $(document).ready(function main() {
 		});
 	}
 
+    // Switch two tiles on the gameboard
+    // Handles both the view (animation) and model movement
 	function gemSwitch() {
 		var yOffset = selectedRow - posY;
 		var xOffset = selectedCol - posX;
@@ -475,18 +525,25 @@ $(document).ready(function main() {
 		jewels[posY][posX] = temp;
 	}
 
+    // TODO: Document removeGems()
+    // Remove get at (col, row) and others involved in a match (streak)
 	function removeGems(row, col) {
 		var gemValue = jewels[row][col];
+
+        // TODO: move to within vertical streak and declare in horizontal
 		var tmp = row;
+		// TODOL move to below streaks where tile is removed from model.
 		$("#gem_" + row + "_" + col).addClass("remove");
 
 		if (isVerticalStreak(row, col)){
+		    // remove matching tiles above current tile
 			while (tmp > 0 && jewels[tmp-1][col] == gemValue) {
 				$("#gem_" + (tmp-1) + "_" + col).addClass("remove");
 				jewels[tmp-1][col] = empty;
 				tmp--;
 			}
 
+            // remove matching tiles below current tile
 			tmp = row;
 			while (tmp < (rows-1) && jewels[tmp+1][col] == gemValue) {
 				$("#gem_" + (tmp+1) + "_" + col).addClass("remove");
@@ -496,6 +553,7 @@ $(document).ready(function main() {
 		}
 
 		if (isHorizontalStreak(row, col)) {
+		    // remove matching tiles left of current tile
 			tmp = col;
 			while (tmp > 0 && jewels[row][tmp-1] == gemValue){
 				$("#gem_" + row + "_" + (tmp-1)).addClass("remove");
@@ -503,6 +561,7 @@ $(document).ready(function main() {
 				tmp--;
 			}
 
+            // remove matching tiles right of current tile
 			tmp = col;
 			while (tmp < (cols-1) && jewels[row][tmp+1] == gemValue) {
 				$("#gem_" + row + "_" + (tmp+1)).addClass("remove");
@@ -511,39 +570,51 @@ $(document).ready(function main() {
 			}
 		}
 
+        // remove current tile
 		jewels[row][col] = empty;
 	}
 
-
+    // Generate a string representation of the game tiles.
+    // NOTE: This generates an rotated view swapping columns and rows
+    // for the purposes of the valid move checking routine that needs
+    // eight (8) columns to work as coded.
+    //
+    // Example output:
+    // 12345678\n
+    // 05682467\n
+    // 65827284\n
+    // 17271123\n
+    // 48263263\n
+    // 11241123\n
+    //
     function gameToString() {
         var theGameString = "";
-        
+
         for (j = 0; j < cols; j++) {
             for (i = 0; i < rows; i++) {
                 theGameString += jewels[i][j];
             }
-            
+
         theGameString += '\n';
         }
-        
+
         return theGameString;
     }
 
+    // Check if the game is over
+    // Game over when there are no valid moves left.
     function checkGameOver() {
-        var moves = validMoves();
-        $('#moves').text('' + moves + ' valid moves');
-        
-        if (!moves) {
+        if (!validMoves()) {
             console.log('GAME OVER!');
             gameOver();
         }
     }
 
-    // #mark Game Over (work in progress)
+    // Check if there are any valid moves left to play.
+    // Uses a very elegant and fast solution using regular expressions from:
+    // http://codegolf.stackexchange.com/questions/26505/determine-if-a-move-exists-in-a-bejeweled-match-3-game/26512#26512
+    // SIDE EFFECT: update the valid moves UI note
     function validMoves() {
-        // Such an elegant and fast solution using regular expressions.
-        // http://codegolf.stackexchange.com/questions/26505/determine-if-a-move-exists-in-a-bejeweled-match-3-game/26512#26512
-        
         var gameString = gameToString();
         var regExes = [
             /(\d)\1\1/g,                 // 3-in-a-row horizontally
@@ -562,8 +633,8 @@ $(document).ready(function main() {
             /(\d)(?:.|\n){8}\1(?:.|\n){9}\1/g,   // 3-in-a-row vertically after bottom shifts left
             /(\d)(?:.|\n){17}\1(?:.|\n){8}\1/g,  // 3-in-a-row vertically after top shifts down
             /(\d)(?:.|\n){8}\1(?:.|\n){17}\1/g,  // 3-in-a-row vertically after bottom shifts up
-        ];                
-                
+        ];
+
         //console.log(gameString);
         validMoveCount = 0;
         regExes.forEach(function(pattern) {
@@ -575,7 +646,10 @@ $(document).ready(function main() {
             }
         });
 
-        console.log('Valid Moves: ' + validMoveCount);        
+        // Update the UI valid move display
+        $('#moves').text('' + moves + ' valid moves');
+
+        console.log('Valid Moves: ' + validMoveCount);
         return validMoveCount;
     }
 
@@ -623,12 +697,14 @@ $(document).ready(function main() {
 });
 
 function gameOver() {
+	postScore(currentScore);
+
     var gameOverDialog = $('#gameover');
     var lastScore = gameOverDialog.find('#lastscore');
     var highScore = gameOverDialog.find('#highscore');
-    
+
     lastScore.text(localStorage.lastScore);
-    highScore.text(localStorage.highScore);   
+    highScore.text(localStorage.highScore);
 
     gameOverDialog.dialog({
 	    dialogClass: 'no-close',
@@ -645,7 +721,7 @@ function gameOver() {
             click: function() {
                 $(this).dialog("close");
                 showLeaderboard();
-            }            
+            }
         }]
     });
 }
@@ -675,8 +751,10 @@ function showAbout() {
     });
 }
 
-function hidePlayFor() {
+// TODO: set localStorage.team to something on initialization
+function playFor(team) {
 	$("#playfor").dialog('close');
+	localStorage.team = myTeam = team;
 }
 
 function showPlayFor() {
@@ -697,41 +775,54 @@ function showPlayFor() {
 	});
 }
 
+function loadLeaderboard(leaderboard) {
+	for (var team = 0; team < jewelTypes; team++) {
+		var teamData = leaderboard[team];
+		var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
+
+		console.log(team + ': '
+			+  scoreSpan.text() + ' to ' + teamData["score"]);
+
+		scoreSpan.text(teamData["score"]);
+	}
+
+	/* -- to sort the leaderboard */
+	var ul = $('ul#teamscores'),
+		li = ul.children('li');
+
+	li.detach().sort(function(a,b) {
+		var scoreA = parseInt($(a).children('.score').text());
+		var scoreB = parseInt($(b).children('.score').text());
+		return scoreB - scoreA;
+	});
+
+	ul.append(li);
+}
+
 function showLeaderboard() {
     // Pull my high score
     var highScore = localStorage.highScore;
     if (highScore) {
         $('#myscores  .score').text(highScore);
     }
-		    
+
+	if (localStorage.leaderboard) {
+		loadLeaderboard(JSON.parse(localStorage.leaderboard));
+	}
+
     // Pull high scores from "server"
     $.ajax({
-        url: 'hiscore.json',
+        url: scoreURL,
         cache : false,
-        datatype: 'jsonp',
+        dataType: 'jsonp',
         success: function(data) {
-            for (var team = 0; team < jewelTypes; team++) {
-                var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
-                
-                //console.log(spanSelector + ': ' + team + ': ' 
-                //    +  scoreSpan.text() + ' to ' + data[team]);
+            loadLeaderboard(data["leaderboard"]);
+			$('#teamscores ' + '.jeweltype0').hide();
 
-                scoreSpan.text(data[team]);
-            }
-            
-            /* -- to sort the leaderboard */
-            var ul = $('ul#teamscores'),
-                li = ul.children('li');
-    
-            li.detach().sort(function(a,b) {
-                var scoreA = parseInt($(a).children('.score').text());
-                var scoreB = parseInt($(b).children('.score').text());
-                return scoreB - scoreA;
-            });
-    
-            ul.append(li);            
+			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
-        error: function() {
+        error: function(e) {
+            console.log(e);
         }
     });
 
@@ -753,6 +844,31 @@ function showLeaderboard() {
                 showPlayFor();
             }
         }]
+    });
+}
+
+function postScore(score) {
+	var team = localStorage.team;
+
+	var scoreData = {
+		"player" : playerName,
+		"team"   : team,
+		"score"  : score,
+	};
+
+    // Pull high scores from "server"
+    $.ajax({
+        url: scoreURL,
+        cache : false,
+        dataType: 'jsonp',
+        data: scoreData,
+        success: function(data) {
+            loadLeaderboard(data["leaderboard"]);
+			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
+        },
+        error: function(e) {
+            console.log(e);
+        }
     });
 }
 
