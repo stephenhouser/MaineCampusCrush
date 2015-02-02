@@ -492,7 +492,7 @@ $(document).ready(function main() {
 						// Update score -- based on tileScore array
 						//console.log("tilesToRemove = " + tilesToRemove 
 						//            + " currentScore += " + tileScores[tilesToRemove] * tileScoreMultipler);
-						//currentScore += tileScores[tilesToRemove--] * tileScoreMultipler;
+						currentScore += tileScores[tilesToRemove--] * tileScoreMultipler;
 						
 						$("#score").text(currentScore);
 						saveScore(currentScore);
