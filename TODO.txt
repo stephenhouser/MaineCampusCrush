@@ -10,7 +10,7 @@ Client:
 - How to score "cascades"
 
 threematch.js:	// TODO: Check for removal of more than three tiles and adjust score multiplier	
-
+threematch.js:	// TODO: This might be redundant as valid cell is checked above.
 threematch.js:  // TODO: Document checkMoving()
 threematch.js:  // TODO: Document placeNewGems()
 threematch.js:  // TODO: Document checkFalling()

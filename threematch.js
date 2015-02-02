@@ -22,8 +22,11 @@
 // These are the major configuration options
 var cols         = 6;   // Number of columns
 var rows         = 8;   // Number of rows
-var jewelScore   = 10;  // Score for a single jewel
 var jewelTypes   = 8;   // Number of different types of "jewels" [1..jewelTypes]
+
+// Each tile scores (fibonacci(x) * 10)
+var tileScores = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811];
+var tileScoreMultipler = 10;
 
 // The URL to post and get high scores to. Refer to Code.gs for details.
 // Must verify it is still the same after making a revision.
@@ -321,7 +324,7 @@ $(document).ready(function main() {
             if (trySwitch) {            // If adjacent cell exists, we can try to swap
     			selectSound.play();
     			
-    			// FIXME: This might be redundant as valid cell is checked above.
+    			// TODO: This might be redundant as valid cell is checked above.
                 // Try to swap if second selection was adjacent the first (marked) one
                 if((Math.abs(selectedRow - posY) == 1 && selectedCol == posX) ||
                    (Math.abs(selectedCol - posX) == 1 && selectedRow == posY)) {
@@ -330,6 +333,7 @@ $(document).ready(function main() {
                     gameState = "switch";
                     gemSwitch();
                 } else {
+                    alert('Do I ever get here? -- Yes!');
 				    // Selection was not adjacent, change selection to this one.
                     selectedRow = posY;
                     selectedCol = posX;
@@ -469,8 +473,9 @@ $(document).ready(function main() {
 
     // Animate tiles being removed from play
 	function gemFade() {
-	    // TODO: Check for removal of more than three tiles and adjust score multiplier	
-	    console.log("gemFade " + $(".remove").length + " tiles");
+	    //console.log("gemFade " + $(".remove").length + " tiles");
+
+	    var tilesToRemove = $(".remove").length;
 	    
 		$.each($(".remove"), function() {
 			clearSound.play();
@@ -484,9 +489,11 @@ $(document).ready(function main() {
 						$(this).remove();
 						checkMoving();
 
-						// Update score
-						//var score = parseInt($("#score").text(), 10) + 10;
-						currentScore += jewelScore;
+						// Update score -- based on tileScore array
+						//console.log("tilesToRemove = " + tilesToRemove 
+						//            + " currentScore += " + tileScores[tilesToRemove] * tileScoreMultipler);
+						//currentScore += tileScores[tilesToRemove--] * tileScoreMultipler;
+						
 						$("#score").text(currentScore);
 						saveScore(currentScore);
 					}
