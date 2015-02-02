@@ -122,7 +122,12 @@ function handleResponse(request) {
     
       // Set the new row values.
       // more efficient to set values as [][] array than individually
-      scoreSheet.getRange(nextRow, 1, 1, row.length).setValues([row]);
+      //scoreSheet.getRange(nextRow, 1, 1, row.length).setValues([row]);
+      // Insert as topmost row...
+      // Insert before row 2 so style comes from row 2 and not header
+      // which would happen if you insertRowAfter(1)
+      scoreSheet.insertRowBefore(2);
+      scoreSheet.getRange(2, 1, 1, row.length).setValues([row]);
     }
 
     // ===== LEADERBOARD =====    
