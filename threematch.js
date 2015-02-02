@@ -606,7 +606,6 @@ $(document).ready(function main() {
     // Game over when there are no valid moves left.
     function checkGameOver() {
         if (!validMoves()) {
-            console.log('GAME OVER!');
             gameOver();
         }
     }
@@ -648,12 +647,18 @@ $(document).ready(function main() {
         });
 
         // Update the UI valid move display
-        $('#moves').text('' + validMoveCount + ' valid moves');
-
-        console.log('Valid Moves: ' + validMoveCount);
+        if (validMoveCount) {
+            $('#moves').text('' + validMoveCount + ' valid moves');
+            //console.log('Valid Moves: ' + validMoveCount);
+        } else {
+            $('#moves').text('Game over');
+            //console.log('Game over');
+        }
         return validMoveCount;
     }
 
+    // Check for vertical streak (match) stemming from (col, row)
+    // Return true if one is found.
 	function isVerticalStreak(row, col) {
 		var gemValue = jewels[row][col];
 		var streak = 0;
@@ -673,6 +678,8 @@ $(document).ready(function main() {
 		return streak > 1;
 	}
 
+    // Check for horizontal streak (match) stemming from (col, row)
+    // Return true if one is found.
 	function isHorizontalStreak(row, col) {
 		var gemValue = jewels[row][col];
 		var streak = 0;
@@ -692,11 +699,16 @@ $(document).ready(function main() {
 		return streak > 1;
 	}
 
+    // Check for streak (match) stemming from (col, row)
+    // Return true if one is found.    
 	function isStreak(row, col) {
 	 	return isVerticalStreak(row, col) || isHorizontalStreak(row, col);
 	}
 });
 
+// The game is over, perform end of game housecleaning.
+// Post final score
+// Show Game Over dialog.
 function gameOver() {
 	postScore(currentScore);
 
@@ -727,6 +739,7 @@ function gameOver() {
     });
 }
 
+// Show the About dialog
 function showAbout() {
 	$("#about").dialog({
         position: { my: "top", at: "top+2%" },
@@ -740,6 +753,7 @@ function showAbout() {
     	    }
         },
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
     	        window.scrollTo(0, 0);
                 $('#about').dialog('close');
@@ -752,12 +766,14 @@ function showAbout() {
     });
 }
 
-// TODO: set localStorage.team to something on initialization
+// Set which team the player is playing for.
+// Used when reporting scores.
 function playFor(team) {
 	$("#playfor").dialog('close');
 	localStorage.team = myTeam = team;
 }
 
+// Show dialog to choose which team to play for.
 function showPlayFor() {
 	$("#playfor").dialog({
 		//dialogClass: 'no-close',
@@ -765,6 +781,7 @@ function showPlayFor() {
 		draggable: false,
 		modal: true,
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#playfor').dialog('close');
             })
@@ -776,17 +793,21 @@ function showPlayFor() {
 	});
 }
 
+// Load data into the leaderboard from the passed dictionary
+// Modify the leaderboard DOM elements
+// Sort the elements to display high score first.
 function loadLeaderboard(leaderboard) {
 	for (var team = 0; team < jewelTypes; team++) {
 		var teamData = leaderboard[team];
 		var scoreSpan = $('#teamscores ' + '.jeweltype' + team + ' .score');
 
-		console.log(team + ': '
-			+  scoreSpan.text() + ' to ' + teamData["score"]);
+		//console.log(team + ': '
+		//	+  scoreSpan.text() + ' to ' + teamData["score"]);
 
 		scoreSpan.text(teamData["score"]);
 	}
 
+    // TODO: Animate sorting of the leaderboard.
 	/* -- to sort the leaderboard */
 	var ul = $('ul#teamscores'),
 		li = ul.children('li');
@@ -800,26 +821,31 @@ function loadLeaderboard(leaderboard) {
 	ul.append(li);
 }
 
+// Show the leaderboard dialog
 function showLeaderboard() {
-    // Pull my high score
+    // Get player's high score from localStorage
     var highScore = localStorage.highScore;
     if (highScore) {
         $('#myscores  .score').text(highScore);
     }
 
+    // Load cached leaderboard data if available.
 	if (localStorage.leaderboard) {
 		loadLeaderboard(JSON.parse(localStorage.leaderboard));
 	}
 
-    // Pull high scores from "server"
+    // Send out a request to get more recent leaderboard data
+    // from the "server"
     $.ajax({
         url: scoreURL,
         cache : false,
         dataType: 'jsonp',
         success: function(data) {
+            // Put it into the DOM
             loadLeaderboard(data["leaderboard"]);
 			$('#teamscores ' + '.loading').hide();
-
+			
+			// Cache a copy for next time....
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
         error: function(e) {
@@ -827,6 +853,7 @@ function showLeaderboard() {
         }
     });
 
+    // Show the actual dialog
 	$("#leaderboard").dialog({
         position: { my: "top", at: "top+2%" },
         close: function onCloseHighScore() {
@@ -834,6 +861,7 @@ function showLeaderboard() {
             window.scrollTo(0, 0);
         },
         create: function onCreateAbout() {
+            // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#leaderboard').dialog('close');
             })
@@ -848,22 +876,25 @@ function showLeaderboard() {
     });
 }
 
+// Post score to the high score server. It's a rather simple affair.
 function postScore(score) {
 	var team = localStorage.team;
 
+    // Format of the data we can post.
 	var scoreData = {
 		"player" : playerName,
 		"team"   : team,
 		"score"  : score,
 	};
 
-    // Pull high scores from "server"
+    // Send the score to the server
     $.ajax({
         url: scoreURL,
         cache : false,
         dataType: 'jsonp',
         data: scoreData,
         success: function(data) {
+            // We get back leaderboard data, easy to cache it for when we want it.
             loadLeaderboard(data["leaderboard"]);
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
@@ -873,6 +904,9 @@ function postScore(score) {
     });
 }
 
+// Save score as we play.
+// Update player's high score
+// DOES NOT SEND TO THE SERVER!
 function saveScore(score) {
     localStorage.lastScore = score;
 
@@ -882,6 +916,7 @@ function saveScore(score) {
     }
 }
 
+// Restart the game
 function restartGame() {
     location.reload();
 }
