@@ -648,7 +648,7 @@ $(document).ready(function main() {
         });
 
         // Update the UI valid move display
-        $('#moves').text('' + moves + ' valid moves');
+        $('#moves').text('' + validMoveCount + ' valid moves');
 
         console.log('Valid Moves: ' + validMoveCount);
         return validMoveCount;
