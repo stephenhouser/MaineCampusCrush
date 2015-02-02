@@ -169,8 +169,8 @@ $(document).ready(function main() {
         currentScore = 0;
         saveScore(currentScore);
 
-        // Initialize all cells to -1 (empty)
-        // TODO: Do we need to pre-initialize all the cells this way?
+        // Initialize all cells to -1 (empty) 
+        // So that streak detection works in next loop.
         for (i = 0; i < rows; i++) {
             jewels[i] = new Array();
             for (j = 0; j < cols; j++) {
@@ -470,6 +470,8 @@ $(document).ready(function main() {
     // Animate tiles being removed from play
 	function gemFade() {
 	    // TODO: Check for removal of more than three tiles and adjust score multiplier	
+	    console.log("gemFade " + $(".remove").length + " tiles");
+	    
 		$.each($(".remove"), function() {
 			clearSound.play();
 			movingItems++;
@@ -530,14 +532,10 @@ $(document).ready(function main() {
     // Remove get at (col, row) and others involved in a match (streak)
 	function removeGems(row, col) {
 		var gemValue = jewels[row][col];
-
-        // TODO: move to within vertical streak and declare in horizontal
-		var tmp = row;
-		// TODOL move to below streaks where tile is removed from model.
-		$("#gem_" + row + "_" + col).addClass("remove");
-
+		
 		if (isVerticalStreak(row, col)){
 		    // remove matching tiles above current tile
+    		var tmp = row;
 			while (tmp > 0 && jewels[tmp-1][col] == gemValue) {
 				$("#gem_" + (tmp-1) + "_" + col).addClass("remove");
 				jewels[tmp-1][col] = empty;
@@ -555,7 +553,7 @@ $(document).ready(function main() {
 
 		if (isHorizontalStreak(row, col)) {
 		    // remove matching tiles left of current tile
-			tmp = col;
+			var tmp = col;
 			while (tmp > 0 && jewels[row][tmp-1] == gemValue){
 				$("#gem_" + row + "_" + (tmp-1)).addClass("remove");
 				jewels[row][tmp-1] = empty;
@@ -571,7 +569,8 @@ $(document).ready(function main() {
 			}
 		}
 
-        // remove current tile
+        // Flag current tile for removal in DOM and actually remove it from the model.
+		$("#gem_" + row + "_" + col).addClass("remove");
 		jewels[row][col] = empty;
 	}
 
