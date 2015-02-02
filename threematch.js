@@ -818,7 +818,7 @@ function showLeaderboard() {
         dataType: 'jsonp',
         success: function(data) {
             loadLeaderboard(data["leaderboard"]);
-			$('#teamscores ' + '.jeweltype0').hide();
+			$('#teamscores ' + '.loading').hide();
 
 			localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
         },
