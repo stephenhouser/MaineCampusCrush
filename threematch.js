@@ -80,29 +80,12 @@ $(document).ready(function main() {
         }
     };
 
-    // Initialize the visual marker that highlights tapped cells.
-    var marker = $('#marker');
-    marker.hide(); // should be display:none in CSS already. Be safe.
-    marker.swipe(swipeHandlers);
-    marker.showAtCell = function(targetCell) {
-        // Position the "marker" to show which cell we have selected.
-        var marginLeft = parseInt(marker.css('margin-left'), 10);
-        var marginTop = parseInt(marker.css('margin-top'), 10);
-        marker.css({
-            "top"    : (targetCell.position().top - marginTop) + "px",
-            "left"   : (targetCell.position().left - marginLeft) + "px",
-            "height" : gemSize + "px",
-            "width"  : gemSize + "px"
-        });
-
-        marker.show();
-    };
-
     // #mark Game Board setup
 
     // Initialize the game grid based on where it got laid out
     var gameGridId = 'gamefield';
     var gameGrid = $('#'+gameGridId);
+    var marker = $('#marker');
     var cellMargin = parseInt(marker.css('margin-left'), 10);
 
     // Compute size of game grid (cellSize) and the gems inside them (gemSize)
@@ -139,6 +122,23 @@ $(document).ready(function main() {
         }
 
     });
+
+    // Initialize the visual marker that highlights tapped cells.
+    marker.hide(); // should be display:none in CSS already. Be safe.
+    marker.swipe(swipeHandlers);
+    marker.showAtCell = function(targetCell) {
+        // Position the "marker" to show which cell we have selected.
+        var marginLeft = parseInt(marker.css('margin-left'), 10);
+        var marginTop = parseInt(marker.css('margin-top'), 10);
+        marker.css({
+            "top"    : (targetCell.position().top - marginTop) + "px",
+            "left"   : (targetCell.position().left - marginLeft) + "px",
+            "height" : gemSize + "px",
+            "width"  : gemSize + "px"
+        });
+
+        marker.show();
+    };
 
     // #mark Sound system initialization
 
@@ -177,16 +177,17 @@ $(document).ready(function main() {
 
         // Initialize all cells to -1 (empty)
         // So that streak detection works in next loop.
-        for (var i = 0; i < rows; i++) {
+        var i, j;
+        for (i = 0; i < rows; i++) {
             jewels[i] = [];
-            for (var j = 0; j < cols; j++) {
+            for (j = 0; j < cols; j++) {
                 jewels[i][j] = empty;
             }
         }
 
         // Fill all cells with initial tiles/jewels
-        for (var i = 0; i < rows; i++) {
-            for (var j = 0; j < cols; j++) {
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
                 // Fill cell with a random jewel that will NOT cause a "streak" (3-match)
                 do {
                     // Standard version. +1 is to make range [1..?] rather than [0..?]
@@ -221,7 +222,7 @@ $(document).ready(function main() {
         var gemId = "gem_" + row +"_" + col;
         gameGrid.append('<div class="gem" id="' + gemId + '"></div>');
 
-        gem = $('#' + gemId);
+        var gem = $('#' + gemId);
         gem.addClass('jeweltype' + jewels[row][col]);
         gem.swipe(swipeHandlers);
         repositionGem(gem, row, col);
@@ -355,7 +356,7 @@ $(document).ready(function main() {
     function checkMoving() {
         movingItems--;
 
-        if (movingItems == 0) {
+        if (movingItems === 0) {
             switch(gameState) {
                 case "revert":
                 case "switch":
@@ -399,6 +400,7 @@ $(document).ready(function main() {
     // Really only checks and fills the top row, tiles fall from there.
     function placeNewGems() {
         var gemsPlaced = 0;
+		var i, j;
 
         for (i = 0; i < cols; i++) {
             if (jewels[0][i] == empty) {
@@ -414,7 +416,7 @@ $(document).ready(function main() {
             gameState = "remove";
             checkFalling();
         } else {
-            var combo = 0
+            var combo = 0;
             for (i = 0; i < rows; i++) {
                 for (j = 0; j < cols; j++){
                     if (j <= (cols - 3) &&
@@ -445,8 +447,8 @@ $(document).ready(function main() {
     function checkFalling(){
         var fellDown = 0;
 
-        for (j = 0; j < cols; j++){
-            for (i = (rows-1); i > 0; i--) {
+        for (var j = 0; j < cols; j++){
+            for (var i = (rows-1); i > 0; i--) {
                 if (jewels[i][j] == empty && jewels[i-1][j] >= 0) {
                     $("#gem_"+(i-1)+"_"+j).addClass("fall").attr("id","gem_"+i+"_"+j);
                     jewels[i][j] = jewels[i-1][j];
@@ -467,7 +469,7 @@ $(document).ready(function main() {
             });
         });
 
-        if (fellDown == 0) {
+        if (fellDown === 0) {
             gameState = "refill";
             movingItems = 1;
             checkMoving();
@@ -524,7 +526,7 @@ $(document).ready(function main() {
                         checkMoving();
                     }
                 }
-            ).removeClass("switch")
+            ).removeClass("switch");
         });
 
         // ...then the view update
@@ -541,11 +543,12 @@ $(document).ready(function main() {
     // TODO: Document removeGems()
     // Remove get at (col, row) and others involved in a match (streak)
     function removeGems(row, col) {
+    	var tmp;
         var gemValue = jewels[row][col];
 
         if (isVerticalStreak(row, col)){
             // remove matching tiles above current tile
-            var tmp = row;
+            tmp = row;
             while (tmp > 0 && jewels[tmp-1][col] == gemValue) {
                 $("#gem_" + (tmp-1) + "_" + col).addClass("remove");
                 jewels[tmp-1][col] = empty;
@@ -563,7 +566,7 @@ $(document).ready(function main() {
 
         if (isHorizontalStreak(row, col)) {
             // remove matching tiles left of current tile
-            var tmp = col;
+            tmp = col;
             while (tmp > 0 && jewels[row][tmp-1] == gemValue){
                 $("#gem_" + row + "_" + (tmp-1)).addClass("remove");
                 jewels[row][tmp-1] = empty;
@@ -600,8 +603,8 @@ $(document).ready(function main() {
     function gameToString() {
         var theGameString = "";
 
-        for (j = 0; j < cols; j++) {
-            for (i = 0; i < rows; i++) {
+        for (var j = 0; j < cols; j++) {
+            for (var i = 0; i < rows; i++) {
                 theGameString += jewels[i][j];
             }
 
@@ -645,10 +648,10 @@ $(document).ready(function main() {
         ];
 
         //console.log(gameString);
-        validMoveCount = 0;
+        var validMoveCount = 0;
         regExes.forEach(function(pattern) {
             var match = pattern.exec(gameString);
-            while (match != null) {
+            while (match !== null) {
                 //console.log('at ' + match.index + ' found pattern "' + pattern + '" ==> ' + match);
                 validMoveCount++;
                 match = pattern.exec(gameString);
@@ -793,7 +796,7 @@ function showPlayFor() {
             // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#playfor').dialog('close');
-            })
+            });
         },
         close: function onClosePlayFor() {
             // ensure we are at the top of the window or things get screwy
@@ -813,7 +816,7 @@ function loadLeaderboard(leaderboard) {
         //console.log(team + ': '
         //  +  scoreSpan.text() + ' to ' + teamData["score"]);
 
-        scoreSpan.text(teamData["score"]);
+        scoreSpan.text(teamData.score);
     }
 
     // TODO: Animate sorting of the leaderboard.
@@ -851,11 +854,11 @@ function showLeaderboard() {
         dataType: 'jsonp',
         success: function(data) {
             // Put it into the DOM
-            loadLeaderboard(data["leaderboard"]);
+            loadLeaderboard(data.leaderboard);
             $('#teamscores ' + '.loading').hide();
 
             // Cache a copy for next time....
-            localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
+            localStorage.leaderboard = JSON.stringify(data.leaderboard);
         },
         error: function(e) {
             console.log(e);
@@ -873,7 +876,7 @@ function showLeaderboard() {
             // Make the titlebar clickable to close. That [x] is really small.
             $(".ui-dialog-titlebar").click(function (){
                 $('#leaderboard').dialog('close');
-            })
+            });
         },
         buttons: [{
             text: "Change Team",
@@ -904,8 +907,8 @@ function postScore(score) {
         data: scoreData,
         success: function(data) {
             // We get back leaderboard data, easy to cache it for when we want it.
-            loadLeaderboard(data["leaderboard"]);
-            localStorage.leaderboard = JSON.stringify(data["leaderboard"]);
+            loadLeaderboard(data.leaderboard);
+            localStorage.leaderboard = JSON.stringify(data.leaderboard);
         },
         error: function(e) {
             console.log(e);
