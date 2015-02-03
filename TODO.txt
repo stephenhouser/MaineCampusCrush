@@ -1,5 +1,6 @@
 Things to clean up.
 
+
 Client:
 
 - Safari in private mode craps out when accessing localStorage.
