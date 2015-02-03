@@ -13,9 +13,9 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0/us/
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
- * As long as you retain this notice you can do whatever you want with this stuff. 
+ * As long as you retain this notice you can do whatever you want with this stuff.
  * If we meet some day, and you think this stuff is worth it, you can buy me a beer
- * in return. 
+ * in return.
  * ----------------------------------------------------------------------------
  */
 * {
@@ -58,7 +58,7 @@ a {
 
 #header .center {
 	text-align: center;
-	font-size: 350%;	
+	font-size: 350%;
 }
 
 #header .center a {
@@ -79,9 +79,10 @@ a {
     height: 90%;
 
     min-width: 320px;
+    max-width: 640px;
 
     /* overflow: hidden; */
-    
+
     -webkit-user-select: none; /* prevent from selecting text */
 
     /* debug */
@@ -92,14 +93,14 @@ a {
     position: absolute;
     margin: 5px;
 	border: 3px solid white;
-	border-radius: 5px;	
+	border-radius: 5px;
 	cursor: pointer;
     background-size: 90%; /*52px;*/
     background-repeat: no-repeat;
-    background-position: center; 
+    background-position: center;
 }
 
-/* unsed at the moment. 
+/* unsed at the moment.
    intended for highlighting the selected tile
 */
 .selected {
@@ -132,7 +133,7 @@ a {
     z-index: 1;
 
     -webkit-animation: marker 250ms infinite alternate;
-    -moz-animation: markern 250ms infinite alternate;    
+    -moz-animation: markern 250ms infinite alternate;
 }
 
 .jeweltype0 {
@@ -250,7 +251,7 @@ ul#myscores li p {
 ul#teamscores li p {
     margin-left: 48px;
     font-weight: bold;
-    font-size: x-large;    
+    font-size: x-large;
 }
 
 ul#myscores li .score,
@@ -258,7 +259,7 @@ ul#teamscores li .score {
     float: right;
     display: inline-block;
     margin: 5px;
-    font-weight: normal;     
+    font-weight: normal;
 }
 
 /* jQuery UI settings */
@@ -269,11 +270,11 @@ ul#teamscores li .score {
 /* Center jQuery buttons on dialogs */
 .ui-dialog .ui-dialog-buttonpane {
     margin: 0px;
-    padding: 0px; 
+    padding: 0px;
     text-align: center;
 }
 
-.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
     float: none;
 }
 
@@ -281,7 +282,7 @@ ul#teamscores li .score {
 /*
 @media only screen
     and (max-device-height : 480px) {
-    
+
     #header .left, #header .right {
         top: 0px;
         font-size: large;
@@ -294,10 +295,10 @@ ul#teamscores li .score {
 */
 
 /* iPhone > =5 ----------- */
-@media only screen 
+@media only screen
     and (min-device-width : 320px)
     and (max-device-width : 480px) {
-    
+
     #header .left, #header .right {
         font-size: large;
      }
@@ -311,13 +312,13 @@ ul#teamscores li .score {
         min-width: 310px;
         height: 98%;
     }
-    
+
     .gem {
         margin: 3px;
         background-size: 95%;
        	border: 2px solid white;
     }
-    
+
     #marker {
         border: 5px solid white;
     }
@@ -325,16 +326,16 @@ ul#teamscores li .score {
 
 /* iPads (portrait and landscape) ----------- */
 /*
-@media only screen 
-    and (min-device-width : 768px) 
+@media only screen
+    and (min-device-width : 768px)
     and (max-device-width : 1024px) {
 }
 */
 
 /* iPads (landscape) ----------- */
-@media only screen 
-    and (min-device-width : 768px) 
-    and (max-device-width : 1024px) 
+@media only screen
+    and (min-device-width : 768px)
+    and (max-device-width : 1024px)
     and (orientation : landscape) {
     #gamefield {
         width: 43%;
@@ -342,9 +343,9 @@ ul#teamscores li .score {
 }
 
 /* iPads (portrait) ----------- */
-@media only screen 
-    and (min-device-width : 768px) 
-    and (max-device-width : 1024px) 
+@media only screen
+    and (min-device-width : 768px)
+    and (max-device-width : 1024px)
     and (orientation : portrait) {
     #gamefield {
         margin-top: 20px;

@@ -2,6 +2,9 @@ Things to clean up.
 
 Client:
 
+- Safari in private mode craps out when accessing localStorage.
+    Prevents anything from running.
+
 - Make some indication of what team you are playing for
     Somewhere while playing, on game over dialog, or on the leaderboard.
 
@@ -10,12 +13,12 @@ Client:
 - How to score "cascades"
 
 - Sound active after switching away -- iOS only? -- Shows on lock screen
+	Using howler 1.7 instead of 2.0 branch? Find CDN for 2.0 branch?
 
 - 2/2/2015 had an erroneous entry in the Leaderboard -- Team="" in row 11
 	some sort of unassociated entry at 16:34 or so. Deleted, wait to happen again/
 
-- Fix max size of tiles -- looks really screwy when it gets large.
-	Maybe at iPad size?
+- Convert marker animation in CSS to JavaScript "transit" ones
 
 threematch.js:	// TODO: This might be redundant as valid cell is checked above.
 threematch.js:  // TODO: Document checkMoving()
