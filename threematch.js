@@ -7,7 +7,7 @@
  * Client based on http://www.emanueleferonato.com/2011/10/07/complete-bejeweled-prototype-made-wiht-jquery/
  * Server based on https://mashe.hawksey.info/2014/07/google-sheets-as-a-database-insert-with-apps-script-using-postget-methods-with-ajax-example/
  *
- * February 1, 2015 - Stephen Houser
+ * February 4, 2015 - Stephen Houser
  *
  * Copyright (C) 2015 Stephen Houser
  * This work is licensed inder a Creative Commons Attribution-Noncommercial-Share
