@@ -107,24 +107,23 @@ a {
     border-color: black;
 }
 
-@-webkit-keyframes marker {
-    from {
-        -webkit-transform: scale(0.95, 0.95);
-    }
 
-    to {
-        -webkit-transform: scale(1.025, 1.025);
-    }
+/* Standard */
+@keyframes marker {
+    from { transform: scale(0.95, 0.95);   }
+    to   { transform: scale(1.025, 1.025); }
 }
 
-@-moz-keyframes marker {
-    from {
-        -moz-transform: scale(0.95, 0.95);
-    }
+/* Chrome, Safari, Opera */
+@-webkit-keyframes marker {
+    from { -webkit-transform: scale(0.95, 0.95);   }
+    to   { -webkit-transform: scale(1.025, 1.025); }
+}
 
-    to {
-        -moz-transform: scale(1.025, 1.025);
-    }
+/* Firefox */
+@-moz-keyframes marker {
+    from { -moz-transform: scale(0.95, 0.95);   }
+    to   { -moz-transform: scale(1.025, 1.025); }
 }
 
 #marker {
@@ -132,8 +131,9 @@ a {
     border: 7px solid white;
     z-index: 1;
 
+    animation: marker 250ms infinite alternate;
     -webkit-animation: marker 250ms infinite alternate;
-    -moz-animation: markern 250ms infinite alternate;
+    -moz-animation: marker 250ms infinite alternate;
 }
 
 .jeweltype0 {
