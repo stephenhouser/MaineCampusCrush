@@ -1,0 +1,12 @@
+{
+  "name": "Campus Crush",
+  "version": "0.9",
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "jquery-ui": "~1.11.2",
+    "jquery-touchswipe": "~1.6",
+    "howler": "~1.1.25",
+    "jquery-transit": "https://github.com/rstacruz/jquery.transit.git#9afd9e4869"
+  },
+  "private": true
+}
